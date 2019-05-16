@@ -1,0 +1,14 @@
+out/
+*.pdf
+*temp.*
+*.out
+*.snm
+*toc
+*.fcb_latexmk
+*.fls
+*.log
+*.nav
+*.bbl
+*.blg
+*.aux
+*.DS_Store
