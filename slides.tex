@@ -39,6 +39,29 @@
 \usepackage{mathtools}
 \usepackage{xargs}
 \usepackage{esvect}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	language=Java,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
 
 \newcommand{\syntaxtag}[1]{{\textit{#1}}}
 \newcommand{\syntaxkeyword}[1]{\texttt{#1}}
@@ -549,10 +572,157 @@
     \end{center}
 	\end{frame}
 
+	\begin{frame}[fragile]{What are intersection types?}
+	\boldmath
+	A simple example of intersection types in pseudo-code.
+	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+		public interface A{
+			public static final String name = "myName";
+		}
+		
+		public interface B{
+			public static final String surname = "mySurname";
+		}
+		
+		public class C implements A,B{
+		}
+		
+	    C example = new(C());
+	   
+	    print(example.name +" "+ example.surname);
+	    
+	    //Print the String "myName mySurname"
+		\end{lstlisting}
+	\end{flushleft}
+	\end{frame}
+
 	\subsection{Why intersection types in Java?}
 	\begin{frame}{Why intersection types in Java?}
-	
+	The need of intersection types was born to make possile the typing of constructs like \textbf{conditional expressions} and \textbf{var}.\\
+	Java need to create an intersection type to be able to statically check the correct type of these two things, Why?
 	\end{frame}
+
+	\begin{frame}
+	\frametitle{Conditional expressions problem}
+	Consider the conditional expression \boldmath{$c:a?b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
+	This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The problem is that Java must evaluate the return type statically.
+	
+	\begin{center}
+		\begin{tikzpicture}[scale = 2.1]
+		\node at (4,0) [rectangle,draw] (a100) {$Class\ A$};
+		\node at (6,0) [rectangle,draw] (b100) {$Class\ B$};
+		\node at (3,1) [rectangle,draw] (c100) {$Object$};
+		\node at (5,1) [rectangle,draw] (d100) {$Interface\ I$};
+		\node at (7,1) [rectangle,draw] (e100) {$Interface\ H$};
+		\draw[dashed, ->] (a100) -> (e100);
+		\draw[thick, ->] (a100) -> (c100);
+		\draw[thick, ->] (b100) -> (c100);
+		\draw[dashed, ->] (a100) -> (d100);
+		\draw[dashed, ->] (b100) -> (d100);
+		\draw[dashed, ->] (b100) -> (e100);
+		\end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conditional expressions problem}
+\boldmath
+To solve this problem Java introduces intersection types.\\
+In this way we can consider the return type of the conditional expression as $I\&H$.\\
+This can sound strange because the attitude of Java is to work with nominal types, but it was the only way.
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/typea}
+\caption{interface TypeA}
+\label{fig:typea}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/typeB}
+\caption{ interface TypeB}
+\label{fig:typeb}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/ClassA}
+\caption{ class ClassA}
+\label{fig:classa}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/classb}
+\caption{ class ClassB}
+\label{fig:classb}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/main}
+\caption{ class main}
+\label{fig:main}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{"images/Schermata da 2019-05-13 11-59-49"}
+\label{fig:schermata-da-2019-05-13-11-59-49}
+\end{figure}
+In this moment Java create an intersection type between TypeA and TypeB that are the more specialized super type in common for ClassA and ClassB.\\
+The conditional expression statically have type \textbf{TypeA\&TypeB}.\\
+Dinamically the type will become ClassA if a>5 otherwise ClassB.
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/mainres}
+\caption{ execution with a<5}
+\label{fig:mainres}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/mainres2}
+\caption{ execution with a>5}
+\label{fig:mainres2}
+\end{figure}
+
+\end{frame}
 
     \subsection{Extending the syntax}
     \begin{frame}{The new syntax}
@@ -754,130 +924,7 @@ fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
 \end{flalign*}
 \end{frame}
 
-\begin{frame}
-\frametitle{The new typing rules - conditional expressions}
-The introduction of intersection types in Java was necessary after the introduction of interfaces because were born some problems with typing for conditional expressions.
-\end{frame}
 
-\begin{frame}
-\frametitle{Conditional expressions problem}
-Consider the conditional expression \boldmath{$c:a?b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
-This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The problem is that Java must evaluate the return type statically.
 
-\begin{center}
-\begin{tikzpicture}[scale = 2.1]
-\node at (4,0) [rectangle,draw] (a100) {$Class\ A$};
-\node at (6,0) [rectangle,draw] (b100) {$Class\ B$};
-\node at (3,1) [rectangle,draw] (c100) {$Object$};
-\node at (5,1) [rectangle,draw] (d100) {$Interface\ I$};
-\node at (7,1) [rectangle,draw] (e100) {$Interface\ H$};
-\draw[dashed, ->] (a100) -> (e100);
-\draw[thick, ->] (a100) -> (c100);
-\draw[thick, ->] (b100) -> (c100);
-\draw[dashed, ->] (a100) -> (d100);
-\draw[dashed, ->] (b100) -> (d100);
-\draw[dashed, ->] (b100) -> (e100);
-\end{tikzpicture}
-\end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Conditional expressions problem}
-\boldmath
-To solve this problem Java introduces intersection types.\\
-In this way we can consider the return type of the conditional expression as $I\&H$.\\
-This can sound strange because the attitude of Java is to work with nominal types, but it was the only way.
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/typea}
-	\caption{interface TypeA}
-	\label{fig:typea}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/typeB}
-	\caption{ interface TypeB}
-	\label{fig:typeb}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/ClassA}
-	\caption{ class ClassA}
-	\label{fig:classa}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/classb}
-	\caption{ class ClassB}
-	\label{fig:classb}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/main}
-	\caption{ class main}
-	\label{fig:main}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{"images/Schermata da 2019-05-13 11-59-49"}
-	\label{fig:schermata-da-2019-05-13-11-59-49}
-\end{figure}
-In this moment Java create an intersection type between TypeA and TypeB that are the more specialized super type in common for ClassA and ClassB.\\
-The conditional expression statically have type \textbf{TypeA\&TypeB}.\\
-Dinamically the type will become ClassA if a>5 otherwise ClassB.
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/mainres}
-	\caption{ execution with a<5}
-	\label{fig:mainres}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-	\centering
-	\includegraphics[width=1\linewidth]{images/mainres2}
-	\caption{ execution with a>5}
-	\label{fig:mainres2}
-\end{figure}
-
-\end{frame}
     
 \end{document}

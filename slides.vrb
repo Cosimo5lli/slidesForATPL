@@ -1,0 +1,23 @@
+\frametitle{What are intersection types?}
+\boldmath
+	A simple example of intersection types in pseudo-code.
+	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+		public interface A{
+			public static final String name = "myName";
+		}
+
+		public interface B{
+			public static final String surname = "mySurname";
+		}
+
+		public class C implements A,B{
+		}
+
+	    C example = new(C());
+
+	    print(example.name +" "+ example.surname);
+
+	    //Print the String "myName mySurname"
+		\end{lstlisting}
+	\end{flushleft}
