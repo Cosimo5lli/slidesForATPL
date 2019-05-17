@@ -578,21 +578,21 @@
 	\begin{flushleft}
 		\begin{lstlisting}[basicstyle=\scriptsize]
 		public interface A{
-			public static final String name = "myName";
 		}
 		
 		public interface B{
-			public static final String surname = "mySurname";
 		}
 		
-		public class C implements A,B{
+		public static <T extends A & B> void example(T source) {
+			switch (source.getClass()){
+				case "A":
+					print(A);
+					break;
+				case "B":
+					print(B);
+					break;
+			}
 		}
-		
-	    C example = new(C());
-	   
-	    print(example.name +" "+ example.surname);
-	    
-	    //Print the String "myName mySurname"
 		\end{lstlisting}
 	\end{flushleft}
 	\end{frame}
