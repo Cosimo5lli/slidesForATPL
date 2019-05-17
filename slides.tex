@@ -565,11 +565,8 @@
     \boldmath
     Let's suppose that we have two types $A$ and $B$.\\
     The intersection type between these types is written like $A\&B$.\\
-    The word \textit{intersection} is a misleading because an intersection of types represent the \textbf{union} of fields and methods, \textcolor{red}{\textbf{NOT}} an intersection.\\
-    \begin{center}
-    $\color{teal} A\&B = A \bigcup B \checkmark$ \hspace{1cm}
-    $\color{red} A\&B = A \bigcap B \times$
-    \end{center}
+    The type $A\&B$ have all the methods of $A$ and $B$ and all the fields of $A$ and $B$.
+    
 	\end{frame}
 
 	\begin{frame}[fragile]{What are intersection types?}
@@ -630,98 +627,66 @@
 \boldmath
 To solve this problem Java introduces intersection types.\\
 In this way we can consider the return type of the conditional expression as $I\&H$.\\
-This can sound strange because the attitude of Java is to work with nominal types, but it was the only way.
+This can sound strange because the attitude of Java is to work with nominal types, but it was the only way and it happens only statically, dinamically the types will become the nominal relative types.
 \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example}
+\framesubtitle{Conditional expression problem and var}
+\begin{flushleft}
+	\begin{lstlisting}[basicstyle=\scriptsize]
+		public interface TypeA {
+		}
+		
+		public interface TypeB {
+		}
+		
+		public class ClassA implements TypeB, TypeA{
+		}
+
+		public class ClassB implements TypeB, TypeA{
+		}
+	\end{lstlisting}
+\end{flushleft}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example}
+\framesubtitle{Conditional expression problem and var}
+\begin{flushleft}
+	\begin{lstlisting}[basicstyle=\scriptsize]
+	public class main {
+	
+		public static void main(String[] args) {
+			double a = Math.random()*10;
+			System.out.print(a);
+	
+			var v = m((h) -> h>5 ? new ClassA() : new ClassB(), a);
+			v.getClass();
+		}
+	
+		static <T> T m(Function<Double, T> a, Double b) {
+			return a.apply(b);
+		}
+	
+	}
+	\end{lstlisting}
+\end{flushleft}
+\end{frame}
+
+
 
 \begin{frame}
 \frametitle{Example}
-\framesubtitle{Conditional expression problem}
+\framesubtitle{Conditional expression problem and var}
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth]{images/typea}
-\caption{interface TypeA}
-\label{fig:typea}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{images/typeB}
-\caption{ interface TypeB}
-\label{fig:typeb}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{images/ClassA}
-\caption{ class ClassA}
-\label{fig:classa}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{images/classb}
-\caption{ class ClassB}
-\label{fig:classb}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{images/main}
-\caption{ class main}
-\label{fig:main}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{"images/Schermata da 2019-05-13 11-59-49"}
+\includegraphics[width=1\linewidth]{"images/esempiovar"}
 \label{fig:schermata-da-2019-05-13-11-59-49}
 \end{figure}
 In this moment Java create an intersection type between TypeA and TypeB that are the more specialized super type in common for ClassA and ClassB.\\
 The conditional expression statically have type \textbf{TypeA\&TypeB}.\\
 Dinamically the type will become ClassA if a>5 otherwise ClassB.
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{images/mainres}
-\caption{ execution with a<5}
-\label{fig:mainres}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Example}
-\framesubtitle{Conditional expression problem}
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth]{images/mainres2}
-\caption{ execution with a>5}
-\label{fig:mainres2}
-\end{figure}
-
 \end{frame}
 
     \subsection{Extending the syntax}

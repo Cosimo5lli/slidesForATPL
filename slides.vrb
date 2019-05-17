@@ -1,23 +1,21 @@
-\frametitle{What are intersection types?}
-\boldmath
-	A simple example of intersection types in pseudo-code.
-	\begin{flushleft}
-		\begin{lstlisting}[basicstyle=\scriptsize]
-		public interface A{
+\frametitle{Example}
+\framesubtitle{Conditional expression problem and var}
+\begin{flushleft}
+	\begin{lstlisting}[basicstyle=\scriptsize]
+	public class main {
+
+		public static void main(String[] args) {
+			double a = Math.random()*10;
+			System.out.print(a);
+
+			var v = m((h) -> h>5 ? new ClassA() : new ClassB(), a);
+			v.getClass();
 		}
 
-		public interface B{
+		static <T> T m(Function<Double, T> a, Double b) {
+			return a.apply(b);
 		}
 
-		public static <T extends A & B> void example(T source) {
-			switch (source.getClass()){
-				case "A":
-					print(A);
-					break;
-				case "B":
-					print(B);
-					break;
-			}
-		}
-		\end{lstlisting}
-	\end{flushleft}
+	}
+	\end{lstlisting}
+\end{flushleft}
