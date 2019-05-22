@@ -605,7 +605,7 @@
 
 	\begin{frame}
 	\frametitle{Conditional expressions problem}
-	Consider the conditional expression \boldmath{$c:a?b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
+	Consider the conditional expression \boldmath{$c?a:b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
 	This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The problem is that Java must evaluate the return type statically.
 	
 	\begin{center}
@@ -924,7 +924,150 @@ fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
 \end{flalign*}
 \end{frame}
 
+    \begin{flame}
+    \frametitle{Interface in conditional expression}
+   The problem: 
+    Since in the presence of interfaces it is possible to have a more complex subtype relationship and not constrained by the tree structure, the problem of understanding what is the minimum common surplus of two classes arises.\newline
+
+    in FJ without interfaces: this is trivial, since in the type tree the least common two-class occurrence is the root of the minimum-length sub-tree that contains both.\newline\newline
+    in FJ with interfaces: requires the introduction of the join operation between types, which returns the minimum common occurrence.\newline\newline
+    L'introduzione delle interfccie in FJ compromette la chiusura della relazione di sottotipo rispetto al join.\newline
+    Vediamo 2 esempi.
+    \end{flame}
 
 
-    
+\begin{frame}{Frame Title}
+I sottotipi di $I_1$ sono $I_1, I_3, I_4$ affinchè la relazione di sottotipo sia chiusa rispetto al join, sarebbe necessario che $join(I_3,I_4)$ avesse come risultato un sottotipo di $I_1$, ma non è così dato che è $I_0$.
+    \begin{center}
+		\begin{tikzpicture}[scale = 1.7]
+		\node at (4.5,1.5)  (a0) {\LARGE
+$I_0$};
+		\node at (4,0) (a3) {\LARGE
+$I_3$};
+		\node at (4,1) (a1) {\LARGE
+$I_1$};
+		\node at (5,1)  (a2) {\LARGE
+$I_2$};
+		\node at (5,0)  (a4) {\LARGE
+$I_4$};
+		\draw[thick, -] (a0) -> (a1);
+		\draw[thick, -] (a0) -> (a2);
+		\draw[thick, -] (a4) -> (a1);
+		\draw[thick, -] (a4) -> (a2);
+		\draw[thick, -] (a3) -> (a1);
+		\draw[thick, -] (a3) -> (a2);
+		\end{tikzpicture}
+	\end{center}
+	Figure: Example of a subtype relationship between interfaces
+\end{frame}
+
+\begin{frame}{Frame Title}
+Qui il $join(I_3,I_4)$ non è definito, dal momento che non c'è un minimo sopratipo comune. 
+    \begin{center}
+		\begin{tikzpicture}[scale = 1.7]
+		\node at (4,0)  (a3) {\LARGE$I_3$};
+		\node at (4,1) (a1) {\LARGE$I_1$};
+		\node at (5,1)  (a2) {\LARGE$I_2$};
+		\node at (5,0)  (a4) {\LARGE$I_4$};
+		\draw[thick, -] (a4) -> (a1);
+		\draw[thick, -] (a4) -> (a2);
+		\draw[thick, -] (a3) -> (a1);
+		\draw[thick, -] (a3) -> (a2);
+		\end{tikzpicture}
+	\end{center}
+	Figure: Example of a subtype relationship between interfaces
+\end{frame}
+
+\begin{frame}{Frame Title}
+          \frametitle{The new typing rules}
+Java solves the problem by assigning a join type statically to the conditional expression, basically it is the intersection of the minimums of the entities involved.\newline\newline considering the example 2. for java the type of the conditional expression: it would be the set of methods common to the interfaces $I_1$ and $I_2$.\newline\newline
+formally, we define the intersection operator:
+\vspace{-30pt}
+      \begin{flalign*}
+        &\dfrac{ CT(I_1) = I_1 implements \aargs I_1\{...\}, CT(I_2) = I_2  implements \aargs I_2\{...\}}{ I_1 \cap I_2 = \{I : I \in \aargs I_1 \wedge I \in I_2  \}} &\\[10pt]
+      &&\syntaxtag{} \\[-20pt]
+    \end{flalign*}
+\end{frame}
+
+\begin{frame}{Frame Title}
+La regola precedente restituisce l'insieme che contiene le interfaccie comuni, la regola di typing per le espressioni condizionali in java diventa quindi.
+          \begin{flalign*}
+        &\dfrac{ \Gamma \vdash e:boolean, \Gamma \vdash A:I_1, \Gamma \vdash B:I_2}{\Gamma \vdash (e?A:B) : I_1 \cap I_2 } &\\[10pt]
+    \end{flalign*}
+    In pratica, l'espressione assume un nuovo tipo, che contiene l'unione dei metodi presenti nelle interfaccie comuni. \newline\newline 
+    Esempio applicativo:
+    \end{frame}
+
+    \begin{frame}[fragile]{Conditional expression typing}
+	\boldmath
+The body of the interfaces.	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+	public interface I0 {
+	    public String method0();
+    }
+    public interface I1 {
+        public String method1();
+    }
+    public interface I2 extends I0, I1 {
+        public String method();
+        public String method2();
+    }
+    public interface I3 extends I0, I1 {
+        public String method();
+        public String method3();
+    }
+	\end{lstlisting}
+	\end{flushleft}
+
+	\end{frame}
+	
+	 \begin{frame}[fragile]{Conditional expression typing}
+	\boldmath
+The body of the classes.	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+	public class A implements I2 {
+	public String method0() {	return "A";	}
+	public String method1() {	return "A";	}
+    public String method() {	return "A";	}
+	public String method2() {	return "A"; }
+}
+
+public class B implements I3 {
+    public String method0() {	return "B";}
+	public String method1() {	return "B";}
+    public String method() {	return "B";}
+    public String method3() {	return "B";}
+}
+	\end{lstlisting}
+	\end{flushleft}
+
+	\end{frame}
+	
+	\begin{frame}[fragile]{Conditional expression typing}
+	\boldmath
+The body of the classes.	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+	
+    public class Main {
+    public static void main(String[] args) {
+		(true ? new A() : new B()).method0();
+		(false ? new A() : new B()).method1();
+		(false ? new A() : new B()).m();
+	}
+}
+	\end{lstlisting}
+	\end{flushleft}
+	With this follow classes structure, the execution of the following program does not report static errors.
+	\end{frame}
+	
+	\begin{frame}
+\frametitle{Example}
+\framesubtitle{Conditional expression problem}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth]{images/example-intersection-type.png}
+\caption{The type that Java creates to assign a type to the conditional expression is \texttt{Object \& I0 \& I1}}
+\label{fig:mainres}
+\end{figure}
+\end{frame}
 \end{document}
