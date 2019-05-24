@@ -886,24 +886,87 @@ fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
 \end{flalign*}
 \end{frame}
 
-\begin{frame}
-\frametitle{Interface in conditional expression}
-The problem:
-Since in the presence of interfaces it is possible to have a more complex subtype relationship and not constrained by the tree structure, the problem of understanding what is the minimum common surplus of two classes arises.\newline
+\begin{frame}{Typing rule for conditional expression}
+There is only one rules:
+    \begin{flalign*}
+&\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : T \quad \Gamma \vdash t_3 : T}
+ {\Gamma \vdash if \quad t_1 \quad then \quad t_2 \quad else \quad t_3 : T } 
+ \end{flalign*}
 
-in FJ without interfaces: this is trivial, since in the type tree the least common two-class occurrence is the root of the minimum-length sub-tree that contains both.\newline\newline
+That means:
+\begin{enumerate}
+    \item $t_1$ must be of the type boolean.
+    \item The types of $t_2$ and $t_3$ they must be of the same type.
+\end{enumerate}
 \end{frame}
 
+\begin{frame}{Typing rule for conditional expression}
+We need a syntax-driven rule for the conditional expressions, such that types are preserved under evaluation while common supertypes of the two branches are considered.\newline
+Two alternatives:
+\begin{enumerate}
+    \item a restricted rule,
+    \item join between the types.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Typing rule for conditional expression}
+There is:
+     \begin{flalign*}
+&\dfrac{t_1 : Bool \quad t_2 : T_i \quad t_3 : T_j \quad T_i <: T_j}
+ {if \quad t_1 \quad then \quad t_2 \quad else \quad t_3 : T_j} 
+ \end{flalign*}
+That has been firstly adopted by Java for typing the expression $t_1 ? t_2 : t_3$.
+\end{frame}
+
+\begin{frame}{Typing rule for conditional expression}
+Typechecking expressions with multiple result branches, such as conditionals or case expressions, in a language with subtyping requires some additional machinery. For example, recall the declarative typing rule for conditionals. More spesific, we need a proposition.
+\begin{enumerate}
+    \item For every pair of types $S$ and $T$, there is some type $J$ such that $S \lor T = J$.
+    \item For every pair of tyes $S$ and $T$ with a common supertype, there is some type $M$ such that $S \wedge	T = M$
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Typing rule for conditional expression}
+     There is:
+     \begin{flalign*}
+&\dfrac{\Gamma \vdash t_1 : T_1 \quad T_1=boolean \quad \Gamma \vdash t_2 : T_2 \quad \Gamma \vdash t_3 : T_3 \quad T_2 \lor T_3 = T}{\Gamma \vdash  if \quad t_1\quad then \quad t_2 \quad else \quad t_3 : T } 
+\end{flalign*}
+Where $T_2 \lor T_3 = T$ is the join of two types, which returns the minimum common supertype.\newline\newline
+However the rule needs to prove, that there is always a join for any pair of types.\newline\newline
+At the moment Java use this rules.
+\end{frame}
+
+\begin{frame}{Why we need interfaces? [1/2]}
+    Interfaces are useful because they permit a richer, non-tree-structured, subtype relation: each class has a single superclass (from which it inherits instance variables and method bodies), but may additionally implement any number of interfaces.\newline\newline
+    But, the presence of interfaces in Java actually forces the choice of an algorithmic presentation of the typing relation, which gives each typable term a unique (minimal) type. The reason is an interaction between conditional
+expressions (written t1 ? t2 : t3 in Java) and interfaces.
+
+\end{frame}
+
+\begin{frame}{Why we need interfaces? [2/2]}
+   
+    Therefore: each class will have a single superclass from which it inherits the instances of the variables and the bodies of the methods, but it can also implement any number of interfaces.
+\end{frame}
 \begin{frame}
-\frametitle{Interface in conditional expression}
-in FJ with interfaces: requires the introduction of the join operation between types, which returns the minimum common occurrence.\newline\newline
-L'introduzione delle interfccie in FJ compromette la chiusura della relazione di sottotipo rispetto al join.\newline
-Vediamo 2 esempi.
+\frametitle{Interface in conditional expression [1/2]}
+\framesubtitle{The problem}
+In the presence of interfaces it is possible to have a more complex subtype relationship not constrained by the tree structure, the problem of understanding what is the minimum common supertype of two classes arises.\newline
+\end{frame}
+
+\begin{frame}{What does it mean specifically? [2/2]}
+    \textit{"With interfaces it is no longer guaranteed that 2 types have the minimum supertype common, which can lead to problems for example on Java conditionals."}
+\end{frame}
+\begin{frame}{Interface in conditional expression}
+    \underline{in FJ without interfaces}: this is trivial, since the minimum common supertype of two classes is the root of its minimal-length sub-tree that contains both.\newline\newline
+    \underline{in FJ with interfaces}: requires the introduction of the join operation between types, which returns the minimum common supertype.\newline\newline
+However in the presence of interfaces, the subtype relation is not necessarily
+closed under joins. 
 \end{frame}
 
 
-\begin{frame}{Frame Title}
-I sottotipi di $I_1$ sono $I_1, I_3, I_4$ affinchè la relazione di sottotipo sia chiusa rispetto al join, sarebbe necessario che $join(I_3,I_4)$ avesse come risultato un sottotipo di $I_1$, ma non è così dato che è $I_0$.
+\begin{frame}{Example 1}
+Consider $I_0,I_1,I_2,I_3,I_4$ interfaces.\newline
+The subtypes of $I_1$ are $I_1, I_3, I_4$ in order that the subtype relationship to be closed with respect to the join, it would be necessary that $join(I_3,I_4)$ had as a result a subtipe of $I_1$, but it is not so since it is $I_0$.
 \begin{center}
 \begin{tikzpicture}[scale = 1.7]
 \node at (4.5,1.5)  (a0) {\LARGE
@@ -924,11 +987,11 @@ $I_4$};
 \draw[thick, -] (a3) -> (a2);
 \end{tikzpicture}
 \end{center}
-Figure: Example of a subtype relationship between interfaces
+Figure: Example of a relationship between interfaces.
 \end{frame}
 
-\begin{frame}{Frame Title}
-Qui il $join(I_3,I_4)$ non è definito, dal momento che non c'è un minimo sopratipo comune.
+\begin{frame}{Example 2}
+Here the $join(I_3,I_4)$ it is not defined, since there is not  minimum common supertype.
 \begin{center}
 \begin{tikzpicture}[scale = 1.7]
 \node at (4,0)  (a3) {\LARGE$I_3$};
@@ -941,28 +1004,41 @@ Qui il $join(I_3,I_4)$ non è definito, dal momento che non c'è un minimo sopra
 \draw[thick, -] (a3) -> (a2);
 \end{tikzpicture}
 \end{center}
-Figure: Example of a subtype relationship between interfaces
+Figure: Example of a relationship between interfaces.
 \end{frame}
 
 \begin{frame}{Frame Title}
 \frametitle{The new typing rules}
-Java solves the problem by assigning a join type statically to the conditional expression, basically it is the intersection of the minimums of the entities involved.\newline\newline considering the example 2. for java the type of the conditional expression: it would be the set of methods common to the interfaces $I_1$ and $I_2$.
-formally, we define the intersection operator:
-\vspace{30pt}
-\begin{flalign*}
-&\dfrac{ CT(I_1) = I_1 implements \aargs I_1\{...\}, CT(I_2) = I_2  implements \aargs I_2\{...\}}{ I_1 \cap I_2 = \{I : I \in \aargs I_1 \wedge I \in I_2  \}} &\\[10pt]
-&&\syntaxtag{} \\[-20pt]
-\end{flalign*}
+Java solves the problem by assigning a join type statically to the conditional expression, basically it is the intersection of the minimums supertypes of the entities involved.\newline\newline 
+Considering the Example 2. \newline\newline 
+For Java the type of the conditional expression: $t_1 ? t_2 : t_3$ it would be the set of the interfaces $I_1$ and $I_2$.
 \end{frame}
 
-\begin{frame}{Frame Title}
-La regola precedente restituisce l'insieme che contiene le interfacce comuni, la regola di typing per le espressioni condizionali in java diventa quindi.
+\begin{frame}
+Insteand of the standard algorithm rule for conditional expression,
+
 \begin{flalign*}
-&\dfrac{ \Gamma \vdash e:boolean, \Gamma \vdash A:I_1, \Gamma \vdash B:I_2}{\Gamma \vdash (e?A:B) : I_1 \cap I_2 } &\\[10pt]
+&\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : E_2 \quad \Gamma \vdash t_3 : E_3 }{\Gamma \vdash t_1 ? t_2 : t_3 : E_2 \lor E_3 } 
 \end{flalign*}
-In pratica, l'espressione assume un nuovo tipo, che contiene l'unione dei metodi presenti nelle interfaccie comuni. \newline\newline
-Esempio applicativo:
+Java uses the following restricted rules:
+\begin{flalign*}
+&\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : E_2 \quad \Gamma \vdash t_3 : E_3 \quad \Gamma \vdash E_2 <: E_3 }
+ {\Gamma \vdash t_1 ? t_2 : t_3 : E_3 } 
+ \end{flalign*}
+
+\begin{flalign*}
+&\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : E_2 \quad \Gamma \vdash t_3 : E_3 \quad \Gamma \vdash E_3 <: E_2 }
+ {\Gamma \vdash t_1 ? t_2 : t_3 : E_2 }
+\end{flalign*}
+These are intuitive sound, but they interact poorly with small-step style operational semantics used for FJ; the type preservativo property is actually false.
 \end{frame}
+\begin{frame}{Frame Title}
+
+Definition: A type $J$ is called a \textit{join} of a pair of types $S$ and $T$, written $S OR
+T = J$, if $S <: J$, $T <: J$, and, for all types $U$, if $S <: U$ and $T <: U$, then $J <: U$.
+\end{frame}
+
+
 
 
 \begin{frame}[fragile]{Normal case expression typing}
@@ -987,7 +1063,7 @@ public class B extends Object  implements I1 {
 \end{frame}
 
 \begin{frame}
-\frametitle{Example}
+\frametitle{Example 1}
 \framesubtitle{Conditional expression problem}
 \begin{figure}
 \centering
@@ -1060,13 +1136,21 @@ With this follow classes structure, the execution of the following program does 
 \end{frame}
 
 \begin{frame}
-\frametitle{Example}
+\frametitle{Example 2}
 \framesubtitle{Conditional expression problem}
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{images/example-intersection-type.png}
-\caption{The type that Java creates to assign a type to the conditional expression is \texttt{Object \& I0 \& I1}}
+\caption{The type that Java creates to assign a type to the conditional expression is \texttt{Object \& I0 \& I1}}.
 \label{fig:mainres}
 \end{figure}
 \end{frame}
+\begin{frame}{Frame Title}
+    \textit{"The intersection type means having both one and the other specific of the interfaces involved, meaning that, that value is in the intersection of both, consequently with the conditional, if they don't have a minimum supertype common, I can pull it with this.."}
+\end{frame}
+
+
+
+
+
 \end{document}
