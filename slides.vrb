@@ -1,6 +1,6 @@
 \frametitle{Example 3}
 \boldmath
-The body of the Main class.
+The body of the Main class.	
 \begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
 public class Main {

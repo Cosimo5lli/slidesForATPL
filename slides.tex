@@ -1075,26 +1075,52 @@ Figure: Example of a relationship between interfaces.
 \end{frame}
 
 \begin{frame}[fragile]{Example 1}
-
-\boldmath
-The body of the classes and interfaces.	\begin{flushleft}
-\begin{lstlisting}[basicstyle=\scriptsize]
-public interface I0 {
-	public String method0();
-}
-public interface I1 {
-	public String method1();
-}
-public class A extends Object implements I0 {
-	public String method0() {return "A";}
-}
-public class B extends Object  implements I1 {
-	public String method1() {return "B";}
-}
-\end{lstlisting}
-\end{flushleft}
-
+	\boldmath
+	The body of the interfaces.	
+	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+		public interface I0 {
+		public String method0();
+		}
+		public interface I1 extends I0 {
+		public String method1();
+		}
+		public interface I2 extends I0 {
+		public String method2();
+		}
+		public interface I3 extends I1 {
+		public String method3();
+		}
+		public interface I4 extends I2 {
+		public String method4();
+		}
+		\end{lstlisting}
+	\end{flushleft}
 \end{frame}
+
+
+\begin{frame}[fragile]{Example 1}
+	\boldmath
+	The body of the classes.	
+	\begin{flushleft}
+		\begin{lstlisting}[basicstyle=\scriptsize]
+		public class A implements I3 {
+		public String method0() {	return "A";	}
+		public String method1() {	return "A";	}
+		public String method2() {	return "A";	}
+		public String method3() {	return "A"; }
+		}
+		
+		public class B implements I4 {
+		public String method0() {	return "B"; }
+		public String method1() {	return "B"; }
+		public String method2() {	return "B"; }
+		public String method4() {	return "B"; }
+		}
+		\end{lstlisting}
+	\end{flushleft}
+\end{frame}
+
 
 \begin{frame}
 \frametitle{Example 1}
@@ -1163,10 +1189,10 @@ public class A implements I2 {
 }
 
 public class B implements I3 {
-	public String method0() {	return "B";}
-	public String method1() {	return "B";}
-	public String method() {	return "B";}
-	public String method3() {	return "B";}
+	public String method0() {	return "B"; }
+	public String method1() {	return "B"; }
+	public String method() {	return "B"; }
+	public String method3() {	return "B"; }
 }
 \end{lstlisting}
 \end{flushleft}
