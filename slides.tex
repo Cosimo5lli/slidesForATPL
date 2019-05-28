@@ -889,7 +889,7 @@ Lorenzo DAMI
 There is only one rules:
     \begin{flalign*}
 &\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : T \quad \Gamma \vdash t_3 : T}
- {\Gamma \vdash if \quad t_1 \quad then \quad t_2 \quad else \quad t_3 : T } 
+{\Gamma \vdash if \quad t_1 \quad then \quad t_2 \quad else \quad t_3 : T } 
  \end{flalign*}
 
 That means:
@@ -938,6 +938,15 @@ However the rule needs to prove, that there is always a join for any pair of typ
 At the moment Java use this rules.
 \end{frame}
 
+\begin{frame}{Subtyping rules}
+	\framesubtitle{Just 3 simple rules, for clearness}
+	\begin{flalign*}T_1 \& T_2 <: T_1\end{flalign*}
+		\begin{flalign*}T_1 \& T_2 <: T_2\end{flalign*}
+	  \begin{flalign*}
+	&\dfrac{S <: T_1 \quad S <: T_2}{S <: T_1 \& T_2} 
+	\end{flalign*}
+\end{frame}
+
 \begin{frame}{Typing rule for conditional expression}
 \framesubtitle{Problem in case of expressiveness}
 However even this rule can be not very expressive, unsatisfactory.
@@ -984,7 +993,7 @@ So in this case: \newline Join($T_2$, $T_3$) = minimum common supertype.
     \item  How can i adopt the the join and subtype rule?
     \item  Is there always the minimum common supertype between two types upon which I can apply it?
     \end{itemize}
-If exist i use the algorithm, and extract the join.
+If exist I use the algorithm, and extract the join.
 \end{frame}
 
 
