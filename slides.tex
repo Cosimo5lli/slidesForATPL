@@ -677,12 +677,6 @@ This can sound strange because the attitude of Java is to work with nominal type
 \begin{frame}[fragile]
 \frametitle{Example}
 \framesubtitle{Conditional expression and var}
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\linewidth]{../../../../Documenti/varexample}
-	\caption{}
-	\label{fig:varexample}
-\end{figure}
 
 \end{frame}
 
@@ -887,7 +881,7 @@ fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
 \end{frame}
 
 \begin{frame}{Conditional expressions in Java}
-\framesubtitle{The Join problem: from a simple rule (FJ) to the introduction (inference) of Intersection Types (FJ+Interfaces)}
+\framesubtitle{The Join problem: from a simple rule (FJ) to the introduction (inference) of Intersection Types (FJ + Interfaces)}
 Lorenzo DAMI    
 \end{frame}
 \begin{frame}{Typing rule for conditional expression}
@@ -938,8 +932,9 @@ That has been firstly adopted by Java for typing the expression $t_1 ? t_2 : t_3
      \begin{flalign*}
 &\dfrac{\Gamma \vdash t_1 : T_1 \quad T_1=boolean \quad \Gamma \vdash t_2 : T_2 \quad \Gamma \vdash t_3 : T_3 \quad T_2 \wedge T_3 = T}{\Gamma \vdash  if \quad t_1\quad then \quad t_2 \quad else \quad t_3 : T } 
 \end{flalign*}
-Where $T_2 \wedge	 T_3 = T$ is the $join(T_2,T_3)$ that equals to $T_2 \& T_3$ (Java code), which returns the minimum common supertype.\newline\newline
-However the rule needs to prove, that there is always a join for any pair of types.\newline\newline
+\newline
+Where $T_2 \wedge	 T_3 = T$ is the $join(T_2,T_3)$ that equals to $T_2 \& T_3$ (Java code), which returns the minimum common supertype.\newline
+However the rule needs to prove, that there is always a join for any pair of types.
 At the moment Java use this rules.
 \end{frame}
 
@@ -963,10 +958,19 @@ The algorithm should choose the most expressive type, i.e. the minimum common su
 
 \begin{frame}{Typing rule for conditional expression}
 \framesubtitle{The choice of the type in this case}
+To calculate the minimal type of an arbitrary conditional expression, we need to calculate the minimal types of its then and else branches and then calculate the least common supertype of these. \newline
 So we can simply conclude that in the presence of two branches, $T_2$ and $T_3$ if they have common supertype, the choice of the minimum common supertype, which is so called join, is safe; because any supertype would be good, and the minimum is the most specialized, because of course if it has the minimum it also has all others (all types above the type structure).    \newline\newline
 So in this case: \newline Join($T_2$, $T_3$) = minimum common supertype.
 \end{frame}
 
+\begin{frame}
+	\frametitle{Introducing the interfaces in conditional expression}
+	\framesubtitle{The problem}
+	In the presence of interfaces it is possible to have a more complex subtype relationship not constrained by the tree structure, the problem of understanding what is the minimum common supertype of two classes arises.\newline
+	\begin{block}{What does it mean specifically?}
+		\textit{"With interfaces it is no longer guaranteed that 2 types have the minimum supertype common, which can lead to problems for example on Java conditionals."}
+	\end{block}
+\end{frame}
 
 \begin{frame}{Why we need interfaces?}
     Interfaces are useful because they permit a richer, non-tree-structured, subtype relation: each class has a single superclass (from which it inherits instance variables and method bodies), but may additionally implement any number of interfaces.\newline\newline
@@ -975,25 +979,13 @@ So in this case: \newline Join($T_2$, $T_3$) = minimum common supertype.
 
 \end{frame}
 
-
-
-\begin{frame}
-\frametitle{Interface in conditional expression}
-\framesubtitle{The problem}
-In the presence of interfaces it is possible to have a more complex subtype relationship not constrained by the tree structure, the problem of understanding what is the minimum common supertype of two classes arises.\newline\newline
-\begin{block}{What does it mean specifically?}
-\textit{"With interfaces it is no longer guaranteed that 2 types have the minimum supertype common, which can lead to problems for example on Java conditionals."}
-\end{block}
-\end{frame}
-
-\begin{frame}{Frame Title}
+\begin{frame}{Interface in conditional expression}
 \framesubtitle{Now, more problems}
 \begin{itemize}
     \item  How can i adopt the the join and subtype rule?
     \item  Is there always the minimum common supertype between two types upon which I can apply it?
     \end{itemize}
-    
-If alaways exist i use the algorithm, and extract the join.
+If exist i use the algorithm, and extract the join.
 \end{frame}
 
 
@@ -1018,7 +1010,7 @@ In this case the minimum common supertype is the largest.
  So, requires the introduction of the join operation between types, which returns the minimum common supertype, however in the presence of interfaces, the subtype relation is not necessarily closed under joins. 
 \end{frame}
 
-\begin{frame}{Example}
+\begin{frame}{Example 0}
     \framesubtitle{In FJ with interfaces}
 Suppose: $t_1 : Bool \quad t_2 : T_2 \quad t_3 : T_3 \quad T_2 <:A \quad T_3 <: A \quad T_2 <: B \quad T_3 <: B$
 Then, during the evaluation:
@@ -1047,33 +1039,34 @@ But A and B are not related, there is no minimum common supertype. Thus I'm losi
     To use the rule, I have to guarantee that for each pair of types, the rule, the algorithm, if it takes the set of common supertypes, there is always a supertype common to the two of them, the minimum.\newline
 And if I add the interfaces here there is no more.
 \end{frame}
-\begin{frame}{Recap}
-Therefore, the basic rule previously seen is correct if I only if I work with only classes, but it is not sufficiently expressive and complete with the addition of the interfaces.\newline\newline
+\begin{frame}{Recap: In Java}
+Therefore, the basic rule previously seen is correct if I only if I use only classes, but it is not sufficiently expressive and complete with the addition of the interfaces.\newline\newline
 Because there is multiple inheritance, I cannot guarantee that there is the minimum for each pair of types.
     
 \end{frame}
 
-\begin{frame}{Frame Title}
+\begin{frame}{In Java}
     The last advancement of Java were the intersection types:\newline
     It is the first time that there are types that do not correspond to class names, and the inference system does the same, denotes the type inferring on the structure, this breaks the nominality of the Java type system and enhances the polymorphism.\newline\newline
-    The inference system goes in search of the common supertype, finds the minimum, if it is unique it takes that, if it has so many it makes the intersection, consequently the type becomes $A&B$.\newline\newline
+    The inference system goes in search of the common supertype, finds the minimum, if it is unique it takes that, if it has so many it makes the intersection, consequently the type becomes $A\&B$.\newline\newline
     Intersection is the set of all the values that belong both to $I_1$ and to $I_2$, or methods etc ... Consequently, I can call above the conditional expression meditate on $I_1$ and $I_2$ ...
 \end{frame}
 
-\begin{frame}{Frame Title}
+\begin{frame}{Rules for managing intersection types: In Java}
 There is always a common supertype: Object.\newline
 So if two entities:
 \begin{itemize}
-\item  if have common supertype  takes the minimum.
-\item  if they are in sequence, it takes the larger of the two which has the least common of the two.
-\item  if they are unrelated but have common supertype it makes the intersection of the minimum.
-\item  if they do not have common supertype and are related there is always a common supertype. Object
+\item  have common supertype, then takes the minimum.
+\item  they are in sequence, it takes the larger of the two which has the least common of the two.
+\item  they are unrelated but have common supertype it makes the intersection of the minimum.
+\item  they do not have common supertype and are related there is always a common supertype: Object.
 \end{itemize}
 The algorithm for building the join is easy.
     
 \end{frame}
 
 \begin{frame}{Example 1}
+
 Consider $I_0,I_1,I_2,I_3,I_4$ interfaces.\newline
 The subtypes of $I_1$ are $I_1, I_3, I_4$ in order that the subtype relationship to be closed with respect to the join, it would be necessary that $join(I_3,I_4)$ had as a result a subtype of $I_1$, but it is not so since it is $I_0$.
 \begin{center}
@@ -1099,28 +1092,8 @@ $I_4$};
 Figure: Example of a relationship between interfaces.
 \end{frame}
 
+\begin{frame}[fragile]{Example 1}
 
-\begin{frame}{Example 2}
-Here the $join(I_3,I_4)$ it is not defined, since there is not  minimum common supertype.
-\begin{center}
-\begin{tikzpicture}[scale = 1.7]
-\node at (4,0)  (a3) {\LARGE$I_3$};
-\node at (4,1) (a1) {\LARGE$I_1$};
-\node at (5,1)  (a2) {\LARGE$I_2$};
-\node at (5,0)  (a4) {\LARGE$I_4$};
-\draw[thick, ->] (a4) -> (a1);
-\draw[thick, ->] (a4) -> (a2);
-\draw[thick, ->] (a3) -> (a1);
-\draw[thick, ->] (a3) -> (a2);
-\end{tikzpicture}
-\end{center}
-Figure: Example of a relationship between interfaces.
-\end{frame}
-
-
-
-
-\begin{frame}[fragile]{Normal case expression typing}
 \boldmath
 The body of the classes and interfaces.	\begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
@@ -1143,7 +1116,7 @@ public class B extends Object  implements I1 {
 
 \begin{frame}
 \frametitle{Example 1}
-\framesubtitle{Conditional expression problem}
+Below, we show the Main.java class.
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{images/example-normal-type.png}
@@ -1152,10 +1125,29 @@ public class B extends Object  implements I1 {
 \end{figure}
 \end{frame}
 
+\begin{frame}{Example 2}
+		\framesubtitle{Case of expression typing with intersection type}
+	Consider $I_0,I_1,I_2,I_3$ interfaces.\newline
+	Here the $join(I_2,I_3)$ it is not defined, since there is not  minimum common supertype.
+	\begin{center}
+		\begin{tikzpicture}[scale = 1.7]
+		\node at (4,0)  (a3) {\LARGE$I_2$};
+		\node at (4,1) (a1) {\LARGE$I_0$};
+		\node at (5,1)  (a2) {\LARGE$I_1$};
+		\node at (5,0)  (a4) {\LARGE$I_3$};
+		\draw[thick, ->] (a4) -> (a1);
+		\draw[thick, ->] (a4) -> (a2);
+		\draw[thick, ->] (a3) -> (a1);
+		\draw[thick, ->] (a3) -> (a2);
+		\end{tikzpicture}
+	\end{center}
+	Figure: Example of a relationship between interfaces.
+\end{frame}
 
-\begin{frame}[fragile]{Conditional expression typing}
+\begin{frame}[fragile]{Example 2}
 \boldmath
-The body of the interfaces.	\begin{flushleft}
+The body of the interfaces.	
+\begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
 public interface I0 {
 	public String method0();
@@ -1175,9 +1167,11 @@ public interface I3 extends I0, I1 {
 \end{flushleft}
 \end{frame}
 
-\begin{frame}[fragile]{Conditional expression typing}
+
+\begin{frame}[fragile]{Example 2}
 \boldmath
-The body of the classes.	\begin{flushleft}
+The body of the classes.	
+\begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
 public class A implements I2 {
 	public String method0() {	return "A";	}
@@ -1196,41 +1190,46 @@ public class B implements I3 {
 \end{flushleft}
 \end{frame}
 
-\begin{frame}[fragile]{Conditional expression typing}
-\boldmath
-The body of the classes.	\begin{flushleft}
-\begin{lstlisting}[basicstyle=\scriptsize]
-
-public class Main {
-	public static void main(String[] args) {
-		(true ? new A() : new B()).method0();
-		(false ? new A() : new B()).method1();
-		(false ? new A() : new B()).m();
-	}
-}
-\end{lstlisting}
-\end{flushleft}
-With this follow classes structure, the execution of the following program does not report static errors.
-\end{frame}
-
 \begin{frame}
 \frametitle{Example 2}
-\framesubtitle{Conditional expression problem}
+Below, we show the Main.java class.
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{images/example-intersection-type.png}
-\caption{The type that Java creates to assign a type to the conditional expression is \texttt{Object \& I0 \& I1}.}
+\caption{The type that Java creates to assign a type to the conditional expression is \texttt{(Object \& I0 \& I1)}.}
 \label{fig:mainres}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Frame Title}
-    \textit{"The intersection type means having both one and the other specific of the interfaces involved, meaning that, that value is in the intersection of both, consequently with the conditional, if they don't have a minimum supertype common, I can pull it with this.."}
+\begin{frame}{Example 2}
+	\begin{block}{What does it mean?}
+    \textit{"The intersection type means having both one and the other specific of the interfaces involved, meaning that value is in the intersection of both, consequently with the conditional, if they don't have a minimum supertype common, I can pull it with this.."}
+\end{block}
 \end{frame}
 
 
-\begin{frame}[fragile]{Frame Title}
+\begin{frame}{Example 3}
+			\framesubtitle{Downcast intersection types with lambda expression}
+			Consider $I_0,I_1$ interfaces.\newline
+	\begin{center}
+		\begin{tikzpicture}[scale = 1.7]
+		\node at (4.5,1.5)  (a0) {\LARGE
+			$(I_0\&I_1)$};
+		\node at (3.5,0) (a1) {\LARGE
+			$I_0$};
+		\node at (5.5,0) (a2) {\LARGE
+			$I_1$};
+
+		\draw[thick, ->] (a1) -> (a0);
+		\draw[thick, ->] (a2) -> (a0);
+		\end{tikzpicture}
+	\end{center}
+Figure: We will se how Java create (and use) a new type.
+\end{frame}
+
+\begin{frame}[fragile]{Example 3}
 \boldmath
+The body of the functional interfaces.	
 \begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
 @FunctionalInterface
@@ -1251,8 +1250,9 @@ public interface I1 {
 \end{flushleft}
 \end{frame}
 
-\begin{frame}[fragile]{Conditional expression typing}
+\begin{frame}[fragile]{Example 3}
 \boldmath
+The body of the Main class.	
 \begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
 public class Main {
@@ -1268,11 +1268,12 @@ public class Main {
 \end{flushleft}
 \end{frame}
 
-\begin{frame}{Frame Title}
+\begin{frame}{Example 3}
+Below, we show the Console after the compilation.
 \begin{figure}
 \centering
 \includegraphics[width=1\linewidth]{images/downcast-java.png}
-\caption{Java output from Console.}
+\caption{Still, i can invoke the method apply(), from the object made with intersection types, and i can invoke also both of the default method of the two previous classes.}
 \label{fig:mainres}
 \end{figure}
 \end{frame}

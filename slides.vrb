@@ -1,15 +1,16 @@
-\frametitle{Conditional expression typing}
+\frametitle{Example 3}
 \boldmath
-The body of the classes.	\begin{flushleft}
+The body of the Main class.	
+\begin{flushleft}
 \begin{lstlisting}[basicstyle=\scriptsize]
-
 public class Main {
 	public static void main(String[] args) {
-		(true ? new A() : new B()).method0();
-		(false ? new A() : new B()).method1();
-		(false ? new A() : new B()).m();
+		var o = (I0 & I1) (x) -> (x + 1);
+		System.out.println(o.apply(1));
+		o.method0();
+		o.method1();
+		System.out.println(o.getClass().getName());
 	}
 }
 \end{lstlisting}
 \end{flushleft}
-With this follow classes structure, the execution of the following program does not report static errors.
