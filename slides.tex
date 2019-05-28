@@ -888,6 +888,7 @@ Lorenzo DAMI
 \framesubtitle{Basic rule}
 There is only one rules:
     \begin{flalign*}
+    &&\syntaxtag{(T-BASE)} \\[-20pt]
 &\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : T \quad \Gamma \vdash t_3 : T}
 {\Gamma \vdash if \quad t_1 \quad then \quad t_2 \quad else \quad t_3 : T } 
  \end{flalign*}
@@ -914,11 +915,13 @@ Two alternatives:
 \framesubtitle{Case 1: A restricted rule}
 Here are the rules:
   \begin{flalign*}
+  &&\syntaxtag{(T-SUB1)} \\[-20pt]
   &\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : E_2 \quad \Gamma \vdash t_3 : E_3 \quad \Gamma \vdash E_2 <: E_3 }
   {\Gamma \vdash t_1 ? t_2 : t_3 : E_3 } 
   \end{flalign*}
   
   \begin{flalign*}
+  &&\syntaxtag{(T-SUB2)} \\[-20pt]
   &\dfrac{\Gamma \vdash t_1 : boolean \quad \Gamma \vdash t_2 : E_2 \quad \Gamma \vdash t_3 : E_3 \quad \Gamma \vdash E_3 <: E_2 }
   {\Gamma \vdash t_1 ? t_2 : t_3 : E_2 }
   \end{flalign*}
@@ -930,6 +933,7 @@ That has been firstly adopted by Java for typing the expression $t_1 ? t_2 : t_3
 \framesubtitle{Case 2: Join between the types}
      There is:
      \begin{flalign*}
+     &&\syntaxtag{(T-JOIN)} \\[-20pt]
 &\dfrac{\Gamma \vdash t_1 : T_1 \quad T_1=boolean \quad \Gamma \vdash t_2 : T_2 \quad \Gamma \vdash t_3 : T_3 \quad T_2 \wedge T_3 = T}{\Gamma \vdash  if \quad t_1\quad then \quad t_2 \quad else \quad t_3 : T } 
 \end{flalign*}
 \newline
@@ -940,17 +944,17 @@ At the moment Java use this rules.
 
 \begin{frame}{Subtyping rules}
 	\framesubtitle{Just 3 simple rules, for clearness}
-	\begin{flalign*}T_1 \& T_2 <: T_1\end{flalign*}
-		\begin{flalign*}T_1 \& T_2 <: T_2\end{flalign*}
-	  \begin{flalign*}
+	
+	\begin{flalign*}&&\syntaxtag{(T-INTER1)} \\[-20pt]T_1 \& T_2 <: T_1\end{flalign*}
+		\begin{flalign*}&&\syntaxtag{(T-INTER2)}\\[-20pt]T_1 \& T_2 <: T_2\end{flalign*}
+	  \begin{flalign*}&&\syntaxtag{(T-INTER3)}\\[-20pt]
 	&\dfrac{S <: T_1 \quad S <: T_2}{S <: T_1 \& T_2} 
 	\end{flalign*}
 \end{frame}
 
 \begin{frame}{Typing rule for conditional expression}
 \framesubtitle{Problem in case of expressiveness}
-However even this rule can be not very expressive, unsatisfactory.
-\newline For example in the situation in the figure, in this case I could choose both type $I_1$ or $I_n$, but the algorithm cannot choose random, it should know which type to choose. \newline
+However even this rule \textit{(T-SUB)} can be not very expressive, unsatisfactory. For example in the situation in the figure, in this case I could choose both type $I_1$ or $I_n$, but the algorithm cannot choose random, it should know which type to choose. \newline
 The algorithm should choose the most expressive type, i.e. the minimum common supertype.
 \begin{center}
 \begin{tikzpicture}[scale = 1.7]
@@ -967,8 +971,8 @@ The algorithm should choose the most expressive type, i.e. the minimum common su
 
 \begin{frame}{Typing rule for conditional expression}
 \framesubtitle{The choice of the type in this case}
-To calculate the minimal type of an arbitrary conditional expression, we need to calculate the minimal types of its then and else branches and then calculate the least common supertype of these. \newline
-So we can simply conclude that in the presence of two branches, $T_2$ and $T_3$ if they have common supertype, the choice of the minimum common supertype, which is so called join, is safe; because any supertype would be good, and the minimum is the most specialized, because of course if it has the minimum it also has all others (all types above the type structure).    \newline\newline
+So, to calculate the minimal type of an arbitrary conditional expression, we need to calculate the minimal types of its then and else branches and then calculate the least common supertype of these. \newline
+We can simply conclude that in the presence of two branches, $T_2$ and $T_3$ if they have common supertype, the choice of the minimum common supertype, which is so called join, is safe; because any supertype would be good, and the minimum is the most specialized, because of course if it has the minimum it also has all others (all types above the type structure).    \newline\newline
 So in this case: \newline Join($T_2$, $T_3$) = minimum common supertype.
 \end{frame}
 
