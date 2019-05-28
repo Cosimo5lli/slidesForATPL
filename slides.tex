@@ -41,6 +41,7 @@ italian %% The additional keys allow foreign texts to be
 \usepackage{esvect}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{bm}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -90,534 +91,516 @@ italian %% The additional keys allow foreign texts to be
 		\tableofcontents[currentsection]
 \end{frame}}
 
+  \AtBeginSection[]{% Print an outline at the beginning of sections
+    \begin{frame}<beamer>
+      \frametitle{Outline for Section \thesection}
+      \tableofcontents[currentsection]
+    \end{frame}}
 
-\section{Extending FJ to interfaces: FIJ}
 
-\begin{frame}
-\frametitle{Extending FJ to interfaces: FIJ}
-\framesubtitle{The final objective}
-We wanto to introduce interfaces in FJ in order to be able to have a more
-sophisticated structure of the types relation (no more a simple tree).
+    \section{Extending FJ to interfaces: FIJ}
 
-We want obviously to maintain the core functionality that we have already, just adding interfaces
-on top of that. Moreover, we want to rest sure that every FIJ program is indeed a valid Java
-program, as it was the case for FJ.
-\end{frame}
+    \begin{frame}
+      \frametitle{Extending FJ to interfaces: FIJ}
+      \framesubtitle{The final objective}
+      We wanto to introduce interfaces in FJ in order to be able to have a more
+      sophisticated structure of the types relation (no more a simple tree).
 
-\begin{frame}
-\frametitle{Simbols and their meanings}
-\framesubtitle{Let's get the notation clear}
-\begin{columns}[onlytextwidth]
-\column{.5\textwidth}
-$I, J$ = interface names\\[5pt]
-$C, D$ = class names\\[5pt]
-$T, U, V$ = types literals\\[5pt]
-$\aargs S, \Sigma, S, Z$ = sets of signatures\\[5pt]
-$\aargs M$ = methods declarations\\[5pt]
-% $K$ = constructor\\
-$\aargs f, \aargs g$ = fields\\[5pt]
-$\aargs x$ = formal parameters\\
-\column{.5\textwidth}
-$\aargs a$ = \parbox{.6\textwidth}{generic list or set of elements as $a$}
-% \begin{flalign*} % allineato alla prima riga
-%   \aargs{I} = \; I_1,&\dots,I_n \;\; or\\
-%   I_1\&&\dots\&I_n
-% \end{flalign*}
-\begin{flalign*} % centrato verticalmente
-&\aargs{I} = {\hspace{15pt} I_1,\dots,I_n \;\; or\atop{
-		I_1\&\dots\&I_n}}&
-\parbox{40pt}{\scriptsize{(specific for\\ interfaces)}}
-\end{flalign*}\\
-$T \in \aargs T \Leftrightarrow \aargs T = T_1,\dots,T,\dots,T_n$\\[5pt]
-$T<:\aargs U \Leftrightarrow T<:U \;\;\; \forall U \in \aargs U$\\[5pt]
-$\aargs T = \aargs U \Leftrightarrow T_i = U_i \;\,for\ 1\leq i\leq n$
-\end{columns}
-\end{frame}
+      We want obviously to maintain the core functionality that we have already, just adding interfaces
+      on top of that. Moreover, we want to rest sure that every FIJ program is indeed a valid Java
+      program, as it was the case for FJ.
+    \end{frame}
 
-\subsection{Extending the syntax}
-\begin{frame}{The new syntax (1/3)}
-\framesubtitle{Classes, interfaces, method signatures}
-\vspace{-10pt}
-\begin{flalign*}
-IN &::= \hspace{175pt}\syntaxtag{interface declaration}&\\
-&\qquad \einterface{I} &\\[10pt]
-S &::= \hspace{136pt}\syntaxtag{method signature declaration}&\\
-&\qquad T \; m(\aargs T \ \aargs x);&\\[10pt]
-CL &::= \hspace{193pt}\syntaxtag{class declaration}&\\
-&\qquad \iclass{C}{C}{I}&\\
-\end{flalign*}
-\end{frame}
+    \begin{frame}
+      \frametitle{Simbols and their meanings}
+      \framesubtitle{Let's get the notation clear}
+        \begin{columns}[onlytextwidth]
+          \column{.5\textwidth}
+              $I, J$ = interface names\\[5pt]
+              $C, D$ = class names\\[5pt]
+              $T, U, V$ = types literals\\[5pt]
+              $\aargs S, \Sigma, S, Z$ = sets of signatures\\[5pt]
+              $\aargs M$ = methods declarations\\[5pt]
+              % $K$ = constructor\\
+              $\aargs f, \aargs g$ = fields\\[5pt]
+              $\aargs x$ = formal parameters\\
+            \column{.5\textwidth}
+              $\aargs a$ = \parbox{.6\textwidth}{generic list or set of elements as $a$}
+              % \begin{flalign*} % allineato alla prima riga
+              %   \aargs{I} = \; I_1,&\dots,I_n \;\; or\\
+              %   I_1\&&\dots\&I_n
+              % \end{flalign*}
+              \begin{flalign*} % centrato verticalmente
+                &\aargs{I} = {\hspace{15pt} I_1,\dots,I_n \;\; or\atop{
+                I_1\&\dots\&I_n}}&
+                \parbox{40pt}{\scriptsize{(specific for\\ interfaces)}}
+              \end{flalign*}\\
+              $T \in \aargs T \Leftrightarrow \aargs T = T_1,\dots,T,\dots,T_n$\\[5pt]
+              $T<:\aargs U \Leftrightarrow T<:U \;\;\; \forall U \in \aargs U$\\[5pt]
+              $\aargs T = \aargs U \Leftrightarrow T_i = U_i \;\,for\ 1\leq i\leq n$
+        \end{columns}
+    \end{frame}
 
-\begin{frame}{The new syntax (2/3)}
-\framesubtitle{Constructor, methods, types}
-\begin{flalign*}
-K &::= \hspace{165pt}\syntaxtag{constructor declaration}&\\
-&\qquad C(\aargs T \ \aargs f\,) \ \{\,\syntaxkeyword{super}(\aargs f\,); \; \syntaxkeyword{this}.\aargs f = \aargs f;\,\}&\\[10pt]
-M &::= \hspace{138pt}\syntaxtag{complete method declaration}&\\
-&\qquad T \; m(\aargs T \ \aargs x) \ \{\,\syntaxkeyword{return } t;\,\}&\\[10pt]
-T &::= \hspace{220pt}\syntaxtag{type literal}&\\
-&\qquad C \; | \; I &\\
-\end{flalign*}
-\end{frame}
+    \subsection{Extending the syntax}
+    \begin{frame}{The new syntax (1/3)}
+      \framesubtitle{Classes, interfaces, method signatures}
+      \vspace{-10pt}
+      \begin{flalign*}
+          IN &::= \hspace{175pt}\syntaxtag{interface declaration}&\\
+          &\qquad \einterface{I} &\\[10pt]
+          S &::= \hspace{136pt}\syntaxtag{method signature declaration}&\\
+          &\qquad T \; m(\aargs T \ \aargs x);&\\[10pt]
+          CL &::= \hspace{193pt}\syntaxtag{class declaration}&\\
+          &\qquad \iclass{C}{C}{I}&\\
+        \end{flalign*}
+      \end{frame}
 
-\begin{frame}{The new syntax (3/3)}
-\framesubtitle{Terms, values}
-\vspace{-10pt}
-\begin{flalign*}
-t &::= &\syntaxtag{terms:}\\
-&\qquad x &\syntaxtag{variables}\\
-&\qquad t.f &\syntaxtag{field access}\\
-&\qquad t.m(\aargs t) &\syntaxtag{method invocation}\\
-&\qquad \syntaxkeyword{new } C(\aargs t) &\syntaxtag{object creation}\\
-&\qquad (T) \ t &\syntaxtag{cast}\\[10pt]
-v &::= &\syntaxtag{values:}\\
-&\qquad \syntaxkeyword{new } C(\aargs v) &\syntaxtag{object creation}
-\end{flalign*}
-\end{frame}
+      \begin{frame}{The new syntax (2/3)}
+        \framesubtitle{Constructor, methods, types}
+        \begin{flalign*}
+          K &::= \hspace{165pt}\syntaxtag{constructor declaration}&\\
+          &\qquad C(\aargs T \ \aargs f\,) \ \{\,\syntaxkeyword{super}(\aargs f\,); \; \syntaxkeyword{this}.\aargs f = \aargs f;\,\}&\\[10pt]
+          M &::= \hspace{138pt}\syntaxtag{complete method declaration}&\\
+          &\qquad T \; m(\aargs T \ \aargs x) \ \{\,\syntaxkeyword{return } t;\,\}&\\[10pt]
+          T &::= \hspace{220pt}\syntaxtag{type literal}&\\
+          &\qquad C \; | \; I &\\
+        \end{flalign*}
+      \end{frame}
 
-\subsection{Extending the subtype relation}
-\begin{frame}
-\frametitle{Extending the definition of the subtype relation}
+      \begin{frame}{The new syntax (3/3)}
+        \framesubtitle{Terms, values}
+        \vspace{-10pt}
+        \begin{flalign*}
+          t &::= &\syntaxtag{terms:}\\
+          &\qquad x &\syntaxtag{variables}\\
+          &\qquad t.f &\syntaxtag{field access}\\
+          &\qquad t.m(\aargs t) &\syntaxtag{method invocation}\\
+          &\qquad \syntaxkeyword{new } C(\aargs t) &\syntaxtag{object creation}\\
+          &\qquad (T) \ t &\syntaxtag{cast}\\[10pt]
+          v &::= &\syntaxtag{values:}\\
+          &\qquad \syntaxkeyword{new } C(\aargs v) &\syntaxtag{object creation}
+      \end{flalign*}
+    \end{frame}
 
-\begin{definition}
-\vspace{-25pt}
-\begin{flalign*}
-&T<:T &\\[5pt]
-&\dfrac{T<:U \qquad U<:V}{T<:V} &\\
-&\dfrac{\mathlarge{CT(C) = \iclass{C}{D}{I}}}{C<:D \quad C<:\aargs I} &\\
-&\dfrac{CT(I) = \einterface{I}[J]}{I<: \aargs{J}} &
-% &\dfrac{CT(C) = \iclass{C}{D}{I}}{C<:\aargs{I}} &
-\end{flalign*}
-\end{definition}
-\end{frame}
+    \subsection{Extending the subtype relation}
+    \begin{frame}
+      \frametitle{Extending the definition of the subtype relation}
 
-\subsection{Auxiliary functions}
+      \begin{definition}
+        \vspace{-25pt}
+        \begin{flalign*}
+          &T<:T &\\[5pt]
+          &\dfrac{T<:U \qquad U<:V}{T<:V} &\\
+          &\dfrac{\mathlarge{CT(C) = \iclass{C}{D}{I}}}{C<:D \quad C<:\aargs I} &\\
+          &\dfrac{CT(I) = \einterface{I}[J]}{I<: \aargs{J}} &
+          % &\dfrac{CT(C) = \iclass{C}{D}{I}}{C<:\aargs{I}} &
+      \end{flalign*}
+      \end{definition}
+    \end{frame}
 
-\begin{frame}{Preparing for extension}
-\boldmath
-% \framesubtitle{Adding some auxiliary functions}
-We add the $IObject$ type: as $Object$ is the supertype of every class,
-so $IObject$ is an empty interface outside the Class Table that is the
-supertype of every interface.
+    \subsection{Auxiliary functions}
 
-We then define a new function $\sig$ on classes and groups of interfaces, we define also a new
-predicate $is\sig ok$ on sets of signatures and we redefine $mtype$ also for interfaces.
-\end{frame}
+    \begin{frame}{Preparing for extension}
+     \boldmath
+      % \framesubtitle{Adding some auxiliary functions}
+      We add the $IObject$ type: as $Object$ is the supertype of every class,
+      so $IObject$ is an empty interface outside the Class Table that is the
+      supertype of every interface.
 
-\subsubsection{$is\sig ok$ predicate}
-\begin{frame}
-\frametitle{$is\sig ok$ predicate}
-\framesubtitle{Defined on a set of signatures}
-This helper predicate is $true$ if and only if the set of signatures is actually an interface,
-that is, for any method name in it, it contains \alert{only one} signature for that name.
-\begin{definition}
-\vspace{-20pt}
-\begin{flalign*}
-&\dfrac{
-T\ m(\aargs T\ \aargs x);\in\Sigma \land U\ m(\aargs U\ \aargs{y});\in\Sigma
-\;\;\alert{\text{ implies }}\;\; T=U \land \aargs{T}=\aargs{U}
-}{is\sig ok(\Sigma)}
-\end{flalign*}
-\end{definition}
-\end{frame}
+      We then define a new function $\sig$ on classes and groups of interfaces, we define also a new
+      predicate $is\sig ok$ on sets of signatures and we redefine $mtype$ also for interfaces.
+    \end{frame}
 
-\subsubsection{$\sig$ function}
+    \subsubsection{$is\sig ok$ predicate}
+    \begin{frame}
+      \frametitle{$is\sig ok$ predicate}
+      \framesubtitle{Defined on a set of signatures}
+      This helper predicate is $true$ if and only if the set of signatures is actually an interface,
+      that is, for any method name in it, it contains \alert{only one} signature for that name.
+      \begin{definition}
+        \vspace{-20pt}
+        \begin{flalign*}
+          &\dfrac{
+            T\ m(\aargs T\ \aargs x);\in\Sigma \land U\ m(\aargs U\ \aargs{y});\in\Sigma
+            \;\;\alert{\text{ implies }}\;\; T=U \land \aargs{T}=\aargs{U}
+          }{is\sig ok(\Sigma)}
+        \end{flalign*}
+      \end{definition}
+    \end{frame}
 
-\begin{frame}{$\sig$ function}
-\framesubtitle{For interfaces and groups of interfaces}
-\begin{definition}
-\vspace{-20pt}
-\begin{flalign*}
-&\sig(IObject)=\emptyset &\\[10pt]
-% &\dfrac{\mathlarge{
-%     CT(I)=\einterface{I}[J] \atop
-%     \sig(\aargs{J}) = \aargs{S}
-% }}{\sig(I) = \aargs{S} \cup \aargs{N} \hs} &\\[10pt]
-% &\dfrac{\mathlarge{
-%     I \in \aargs{I} \quad \sig(I) = \aargs S \quad \sig(\aargs I \setminus \{I\}) = \aargs R
-% }}{\sig(\aargs I) = \aargs S \cup \aargs R}
-&\dfrac{
-\mathlarge{
-CT(I) = \einterface{I}[J] \atop
-% \Sigma = \sig(J_1)\cup\dots\cup\sig(J_n)\cup\aargs N
-\Sigma = \sig(J_1,\dots, J_n)
-}
-}{\sig(I) = \Sigma \cup\aargs S}&\\[10pt]
-&\dfrac{
-\mathlarge{
-\Sigma = \sig(I_1)\cup\dots\cup\sig(I_n)
-% \qquad is\sig ok(\Sigma)
-}
-}{\sig(I_1, \dots, I_n) = \Sigma}&
-\end{flalign*}
-\end{definition}
-\end{frame}
+    \subsubsection{$\sig$ function}
 
-\begin{frame}{$\sig$ function}
-\framesubtitle{For classes}
-\begin{definition}
-\vspace{-20pt}
-\begin{flalign*}
-&\sig(Object) = \emptyset &\\[5pt]
-&\dfrac{\mathlarge{
-CT(C) = \iclass{C}{D}{I}
-\onto{ \Sigma = \bigl\{ T \;\; m(\aargs T \ \aargs x); \; \big| \; T \;\; m(\aargs T \ \aargs x) \{\syntaxkeyword{return } t;\} \in \aargs{M} \bigr\}
-\onto{\sig(D) = S}
-% \qquad \sig(\aargs I) = Z
-}
-}}{\sig(C)=\Sigma \cup S \hs}&
-\end{flalign*}
-\end{definition}
-% \scriptsize{
-% \begin{alertblock}{Note}
-%   We include the signatures of the implemented interfaces. This will be useful later when
-%   dealing with the typing of classes.
-% \end{alertblock}}
-\end{frame}
+    \begin{frame}{$\sig$ function}
+      \framesubtitle{For interfaces and groups of interfaces}
+      \begin{definition}
+        \vspace{-20pt}
+        \begin{flalign*}
+          &\sig(IObject)=\emptyset &\\[10pt]
+          % &\dfrac{\mathlarge{
+          %     CT(I)=\einterface{I}[J] \atop
+          %     \sig(\aargs{J}) = \aargs{S}
+          % }}{\sig(I) = \aargs{S} \cup \aargs{N} \hs} &\\[10pt]
+          % &\dfrac{\mathlarge{
+          %     I \in \aargs{I} \quad \sig(I) = \aargs S \quad \sig(\aargs I \setminus \{I\}) = \aargs R
+          % }}{\sig(\aargs I) = \aargs S \cup \aargs R}
+          &\dfrac{
+            \mathlarge{
+              CT(I) = \einterface{I}[J] \atop
+              % \Sigma = \sig(J_1)\cup\dots\cup\sig(J_n)\cup\aargs N
+              \Sigma = \sig(J_1,\dots, J_n)
+            }
+          }{\sig(I) = \Sigma \cup\aargs S}&\\[10pt]
+          &\dfrac{
+            \mathlarge{
+              \Sigma = \sig(I_1)\cup\dots\cup\sig(I_n)
+              % \qquad is\sig ok(\Sigma)
+            }
+          }{\sig(I_1, \dots, I_n) = \Sigma}&
+      \end{flalign*}
+      \end{definition}
+    \end{frame}
 
-\subsubsection{mtype function}
-\begin{frame}
-\frametitle{mtype function}
-% \framesubtitle{For interfaces}
-\begin{definition}
-\vspace{-20pt}
-\begin{flalign*}
-% &\dfrac{
-%   CT(I) = \einterface{I} \quad T \ m(\aargs T \ \aargs x); \in \aargs S
-% }
-% {mtype(m,I) = \aargs T \rightarrow T \hs} &\\[10pt]
-% &\dfrac{
-%   \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
-%     CT(I) = \einterface{I}
-%     \atop m \text{ is not in declared in } I \qquad T\ m(\aargs T\ \aargs x); \in \sig(\aargs I)
-%   }
-% }
-% {mtype(m,I) = \aargs T \rightarrow T}
-% &&\syntaxtag{(for interfaces)}\\[-25pt]
-% &\dfrac{
-%     T\ m(\aargs T\ \aargs x);\, \in\, \sig(I)
-% }
-% {mtype(m,I) = \aargs T \rightarrow T}&\\[10pt]
-% &&\syntaxtag{(for classes)}\\[-22pt]
-% &\dfrac{
-%   T\ m(\aargs T\ \aargs x);\,\in\,\sig(C)
-% }{mtype(m, C)=\aargs T \rightarrow T}
-&\dfrac{
-U\ m(\aargs U\ \aargs x);\,\in\,\sig(T)
-}{mtype(m, T)=\aargs U \rightarrow U}
-% \\[5pt]
-% &\dfrac{
-%   % \mathlarge
-%   {
-%     CT(C)=\iclass{C}{D}{I} \atop
-%     T\ m(\aargs T\ \aargs x);\,\{\syntaxkeyword{return }t;\} \in\, \aargs M
-%   }
-% }{mtype(m,C) = \aargs T \rightarrow T}&
-\end{flalign*}
-\end{definition}
-\small{
-\begin{alertblock}{Note}
-\boldmath
-The $\sig$ function greatly simplify the definition of $mtype$.\\
-% Please, also note that with this definition if a class $C$ doesn't implement a method body for $m$,
-% a method declared in an implemented interface, $mtype(m,C)$ will still be defined, returning
-% the expected type for the method. This is not a problem, we will see that we can use $mbody$ to correctly
-% check this.
-%
-Also note that, as was the case in FJ, $mtype(m,C)$ is not defined if the method $m$ is not implemented
-in $C$ or any of its superclasses.
-\end{alertblock}
-}
-\end{frame}
+    \begin{frame}{$\sig$ function}
+      \framesubtitle{For classes}
+      \begin{definition}
+        \vspace{-20pt}
+        \begin{flalign*}
+          &\sig(Object) = \emptyset &\\[5pt]
+          &\dfrac{\mathlarge{
+                CT(C) = \iclass{C}{D}{I}
+                \onto{ \Sigma = \bigl\{ U \;\; m(\aargs U \ \aargs x); \; \big| \; U \;\; m(\aargs U \ \aargs x) \{\syntaxkeyword{return } t;\} \in \aargs{M} \bigr\}
+                \onto{\sig(D) = S}
+                % \qquad \sig(\aargs I) = Z
+              }
+          }}{\sig(C)=\Sigma \cup S \hs}&
+      \end{flalign*}
+      \end{definition}
+      % \scriptsize{
+      % \begin{alertblock}{Note}
+      %   We include the signatures of the implemented interfaces. This will be useful later when
+      %   dealing with the typing of classes.
+      % \end{alertblock}}
+    \end{frame}
 
-% \subsubsection{$mbody$ function}
+    \subsubsection{mtype function}
+    \begin{frame}
+      \frametitle{mtype function}
+      % \framesubtitle{For interfaces}
+      \begin{definition}
+        \vspace{-20pt}
+        \begin{flalign*}
+          % &\dfrac{
+          %   CT(I) = \einterface{I} \quad T \ m(\aargs T \ \aargs x); \in \aargs S
+          % }
+          % {mtype(m,I) = \aargs T \rightarrow T \hs} &\\[10pt]
+          % &\dfrac{
+          %   \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
+          %     CT(I) = \einterface{I}
+          %     \atop m \text{ is not in declared in } I \qquad T\ m(\aargs T\ \aargs x); \in \sig(\aargs I)
+          %   }
+          % }
+          % {mtype(m,I) = \aargs T \rightarrow T}
+          % &&\syntaxtag{(for interfaces)}\\[-25pt]
+          % &\dfrac{
+          %     T\ m(\aargs T\ \aargs x);\, \in\, \sig(I)
+          % }
+          % {mtype(m,I) = \aargs T \rightarrow T}&\\[10pt]
+          % &&\syntaxtag{(for classes)}\\[-22pt]
+          % &\dfrac{
+          %   T\ m(\aargs T\ \aargs x);\,\in\,\sig(C)
+          % }{mtype(m, C)=\aargs T \rightarrow T}
+          &\dfrac{
+            U\ m(\aargs U\ \aargs x);\,\in\,\sig(T)
+          }{mtype(m, T)=\aargs U \rightarrow U}
+          % \\[5pt]
+          % &\dfrac{
+          %   % \mathlarge
+          %   {
+          %     CT(C)=\iclass{C}{D}{I} \atop
+          %     T\ m(\aargs T\ \aargs x);\,\{\syntaxkeyword{return }t;\} \in\, \aargs M
+          %   }
+          % }{mtype(m,C) = \aargs T \rightarrow T}&
+        \end{flalign*}
+      \end{definition}
+      \small{
+        \begin{alertblock}{Note}
+        \boldmath
+          The $\sig$ function greatly simplify the definition of $mtype$.\\
+          % Please, also note that with this definition if a class $C$ doesn't implement a method body for $m$,
+          % a method declared in an implemented interface, $mtype(m,C)$ will still be defined, returning
+          % the expected type for the method. This is not a problem, we will see that we can use $mbody$ to correctly
+          % check this.
+          %
+          Also note that, as was the case in FJ, $mtype(m,C)$ is not defined if the method $m$ is not implemented
+          in $C$ or any of its superclasses.
+        \end{alertblock}
+      }
+    \end{frame}
 
-\begin{frame}{$mbody$ function}
-\framesubtitle{Just a recall of the definition}
-\begin{definition}
-\vspace{-20pt}
-\begin{flalign*}
-&\dfrac{
-\mathlarge{
-CT(I) = \iclass{C}{D}{I} \atop
-T\ m(\aargs T\ \aargs x)\; \{\syntaxkeyword{return }t;\}\,\in\aargs M
-}
-}{mbody(m,C) = (\aargs x, t)}&\\[10pt]
-&\dfrac{
-\mathlarge{
-CT(C)=\iclass{C}{D}{I}
-\atop m\text{ is not defined in }\aargs M
-}
-}{mbody(m,C) = mbody(m,D)}&
-\end{flalign*}
-\end{definition}
-\end{frame}
+    % \subsubsection{$mbody$ function}
 
-% \begin{frame}
-%   \frametitle{mtype function}
-%   \framesubtitle{For classes}
-%   \begin{definition}
-%     \vspace{-20pt}
-%     \begin{flalign*}
-%       &\dfrac{
-%         \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
-%           CT(C) = \iclass{C}{D}{I}
-%           \atop C \ m(\aargs C \ \aargs x); \in \aargs N
-%         }
-%       }
-%       {
-%         mtype(m,C) = \aargs C \rightarrow C \hs} &\\[10pt] %a capo di 10 punti per fare spazio
-%       &\dfrac{
-%         \mathlarge{
-%           CT(C) = \iclass{C}{D}{I}
-%           \atop m \text{ is not in declared in } I \hs
-%         }
-%       }
-%       {mtype(m,C) = mtype(m,D)}
-%   \end{flalign*}
-%   \end{definition}
-% \end{frame}
+    \begin{frame}{$mbody$ function}
+      \framesubtitle{Just a recall of the definition}
+      \begin{definition}
+        \vspace{-20pt}
+        \begin{flalign*}
+          &\dfrac{
+            \mathlarge{
+              CT(I) = \iclass{C}{D}{I} \atop
+              T\ m(\aargs T\ \aargs x)\; \{\syntaxkeyword{return }t;\}\,\in\aargs M
+            }
+          }{mbody(m,C) = (\aargs x, t)}&\\[10pt]
+          &\dfrac{
+            \mathlarge{
+              CT(C)=\iclass{C}{D}{I}
+              \atop m\text{ is not defined in }\aargs M
+            }
+          }{mbody(m,C) = mbody(m,D)}&
+      \end{flalign*}
+      \end{definition}
+    \end{frame}
 
-% \begin{frame}
-%   \frametitle{names function}
-%   % \framesubtitle{}
-%   Really small function, but it let us define the next predicate, $compatible$, in a more
-%   compact and readable way.
-%   \begin{definition}
-%     \vspace{-20pt}
-%     \begin{flalign*}
-%       &\dfrac{
-%         \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
-%           P = \{m\; \big| \; T\; m(\aargs T \ \aargs x); \in signatures(\aargs I)\}
-%         }
-%       }
-%       {names(\aargs I) = P}
-%   \end{flalign*}
-%   \end{definition}
-% \end{frame}
+    % \begin{frame}
+    %   \frametitle{mtype function}
+    %   \framesubtitle{For classes}
+    %   \begin{definition}
+    %     \vspace{-20pt}
+    %     \begin{flalign*}
+    %       &\dfrac{
+    %         \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
+    %           CT(C) = \iclass{C}{D}{I}
+    %           \atop C \ m(\aargs C \ \aargs x); \in \aargs N
+    %         }
+    %       }
+    %       {
+    %         mtype(m,C) = \aargs C \rightarrow C \hs} &\\[10pt] %a capo di 10 punti per fare spazio
+    %       &\dfrac{
+    %         \mathlarge{
+    %           CT(C) = \iclass{C}{D}{I}
+    %           \atop m \text{ is not in declared in } I \hs
+    %         }
+    %       }
+    %       {mtype(m,C) = mtype(m,D)}
+    %   \end{flalign*}
+    %   \end{definition}
+    % \end{frame}
 
-% \subsubsection{compatible predicate}
-% \begin{frame}
-%   \frametitle{compatible predicate}
-%   \framesubtitle{Defined on groups of interfaces}
-%   \vspace{-5pt}
-%   \begin{definition}
-%     \vspace{-30pt}
-%     \begin{flalign*}
-%       % &\dfrac{
-%       %   \mathlarge{
-%       %     I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J})
-%       %     \onto{
-%       %       (T\; m(\aargs{T}\ \aargs x); \in signatures(\aargs J) \text{ implies } mtype(m, I) \text{ not defined}
-%       %       \onto{
-%       %         \text{or } T\; m(\aargs T\ \aargs x); \in signatures(\aargs J) \land mtype(m, I) = \aargs T \rightarrow T)
-%       %       }
-%       %     }
-%       %   }
-%       % }
-%       % &\dfrac{
-%       %   \mathlarge{
-%       %     I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J})
-%       %     \onto{ P = \{m\; \big| \; T\; m(\aargs T \ \aargs x); \in signatures(\aargs I)\} \qquad m\in P
-%       %       \onto{
-%       %         (mtype(m,\aargs J)=\aargs U \rightarrow U \text{ implies } mtype(m, I) \text{ not defined}
-%       %         \onto{
-%       %           \text{or } mtype(m,\aargs J)=\aargs U \rightarrow U \land mtype(m, I) = \aargs U \rightarrow U)
-%       %         }
-%       %       }
-%       %     }
-%       %   }
-%       % }
-%       &\dfrac{}{compatible(I)}\\[10pt]
-%       &\dfrac{
-%         \mathlarge{
-%           I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J}) \qquad m\in names(\aargs I)
-%             \onto{
-%               mtype(m,\aargs J)=\aargs U \rightarrow U \;\; \alert{\text{implies}}\;\; mtype(m, I) \;\;\alert{\text{not defined}}
-%             }
-%         }
-%       }
-%       {compatible(\aargs I) \hs}\\[10pt]
-%       &\dfrac{
-%         \mathlarge{
-%           I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J}) \qquad m\in names(\aargs I)
-%             \onto{
-%                 mtype(m,\aargs J)=\aargs U \rightarrow U \qquad mtype(m, I) = \aargs U \rightarrow U \hs
-%             }
-%         }
-%       }
-%       {compatible(\aargs I) \hs}
-%     \end{flalign*}
-%   \end{definition}
-% \end{frame}
+    % \begin{frame}
+    %   \frametitle{names function}
+    %   % \framesubtitle{}
+    %   Really small function, but it let us define the next predicate, $compatible$, in a more
+    %   compact and readable way.
+    %   \begin{definition}
+    %     \vspace{-20pt}
+    %     \begin{flalign*}
+    %       &\dfrac{
+    %         \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
+    %           P = \{m\; \big| \; T\; m(\aargs T \ \aargs x); \in signatures(\aargs I)\}
+    %         }
+    %       }
+    %       {names(\aargs I) = P}
+    %   \end{flalign*}
+    %   \end{definition}
+    % \end{frame}
 
-\subsection{Extending the typing rules}
+    % \subsubsection{compatible predicate}
+    % \begin{frame}
+    %   \frametitle{compatible predicate}
+    %   \framesubtitle{Defined on groups of interfaces}
+    %   \vspace{-5pt}
+    %   \begin{definition}
+    %     \vspace{-30pt}
+    %     \begin{flalign*}
+    %       % &\dfrac{
+    %       %   \mathlarge{
+    %       %     I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J})
+    %       %     \onto{
+    %       %       (T\; m(\aargs{T}\ \aargs x); \in signatures(\aargs J) \text{ implies } mtype(m, I) \text{ not defined}
+    %       %       \onto{
+    %       %         \text{or } T\; m(\aargs T\ \aargs x); \in signatures(\aargs J) \land mtype(m, I) = \aargs T \rightarrow T)
+    %       %       }
+    %       %     }
+    %       %   }
+    %       % }
+    %       % &\dfrac{
+    %       %   \mathlarge{
+    %       %     I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J})
+    %       %     \onto{ P = \{m\; \big| \; T\; m(\aargs T \ \aargs x); \in signatures(\aargs I)\} \qquad m\in P
+    %       %       \onto{
+    %       %         (mtype(m,\aargs J)=\aargs U \rightarrow U \text{ implies } mtype(m, I) \text{ not defined}
+    %       %         \onto{
+    %       %           \text{or } mtype(m,\aargs J)=\aargs U \rightarrow U \land mtype(m, I) = \aargs U \rightarrow U)
+    %       %         }
+    %       %       }
+    %       %     }
+    %       %   }
+    %       % }
+    %       &\dfrac{}{compatible(I)}\\[10pt]
+    %       &\dfrac{
+    %         \mathlarge{
+    %           I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J}) \qquad m\in names(\aargs I)
+    %             \onto{
+    %               mtype(m,\aargs J)=\aargs U \rightarrow U \;\; \alert{\text{implies}}\;\; mtype(m, I) \;\;\alert{\text{not defined}}
+    %             }
+    %         }
+    %       }
+    %       {compatible(\aargs I) \hs}\\[10pt]
+    %       &\dfrac{
+    %         \mathlarge{
+    %           I \in \aargs I \qquad \aargs J = \aargs I \setminus \{I\} \qquad compatible(\aargs{J}) \qquad m\in names(\aargs I)
+    %             \onto{
+    %                 mtype(m,\aargs J)=\aargs U \rightarrow U \qquad mtype(m, I) = \aargs U \rightarrow U \hs
+    %             }
+    %         }
+    %       }
+    %       {compatible(\aargs I) \hs}
+    %     \end{flalign*}
+    %   \end{definition}
+    % \end{frame}
 
-\begin{frame}
-\frametitle{The new typing rules}
-\vspace{-30pt}
-\begin{flalign*}
-&&\syntaxtag{(T-VAR)} \\[-20pt]
-&\dfrac{ x:T \in \Gamma }{ \Gamma \vdash x:T } &\\[10pt]
-&&\syntaxtag{(T-FIELD)} \\[-20pt]
-&\dfrac{ \Gamma \vdash t_0 : C_0 \qquad fields(C_0) = \aargs T \; \aargs f}
-{\Gamma \vdash t_0 . f_i : T_i }&\\[10pt]
-&&\syntaxtag{(T-UCAST)} \\[-20pt]
-&\dfrac{ \Gamma \vdash t_0 : U \qquad U <: T}
-{ \Gamma \vdash (T)\, t_0 : T} &\\[10pt]
-&&\syntaxtag{(T-DCAST)} \\[-20pt]
-&\dfrac{ \Gamma \vdash t_0:U \qquad T <: U \qquad T \neq U}
-{ \Gamma \vdash (T)\, t_0:T}
-\end{flalign*}
-\end{frame}
+    \subsection{Extending the typing rules}
 
-\begin{frame}
-\frametitle{The new typing rules}
-\vspace{-30pt}
-\begin{flalign*}
-&&\syntaxtag{(T-INVK)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-\Gamma \vdash t_0:C_0 \qquad mtype(m, C_0) = \aargs U \rightarrow T
-\atop
-\Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
-}
-}{ \Gamma \vdash t_0.m(\aargs t): T \hs} &\\[10pt]
-&&\syntaxtag{(T-NEW)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-fields(C) = \aargs U \ \aargs f \atop
-\Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
-}
-}{\Gamma \vdash \syntaxkeyword{new }C(\aargs t):C \hs}&\\[10pt]
-\end{flalign*}
-\end{frame}
+    \begin{frame}
+      \frametitle{The new typing rules}
+      \vspace{-30pt}
+      \begin{flalign*}
+        &&\syntaxtag{(T-VAR)} \\[-20pt]
+        &\dfrac{ x:T \in \Gamma }{ \Gamma \vdash x:T } &\\[10pt]
+        &&\syntaxtag{(T-FIELD)} \\[-20pt]
+        &\dfrac{ \Gamma \vdash t_0 : C_0 \qquad fields(C_0) = \aargs T \; \aargs f}
+        {\Gamma \vdash t_0 . f_i : T_i }&\\[10pt]
+        &&\syntaxtag{(T-UCAST)} \\[-20pt]
+        &\dfrac{ \Gamma \vdash t_0 : U \qquad U <: T}
+        { \Gamma \vdash (T)\, t_0 : T} &\\[10pt]
+        &&\syntaxtag{(T-DCAST)} \\[-20pt]
+        &\dfrac{ \Gamma \vdash t_0:U \qquad T <: U \qquad T \neq U}
+        { \Gamma \vdash (T)\, t_0:T}
+    \end{flalign*}
+    \end{frame}
 
-\begin{frame}
-\frametitle{The new typing rules}
-\vspace{-30pt}
-\begin{flalign*}
-&&\syntaxtag{(m OK in C)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-\aargs x: \aargs T, \syntaxkeyword{this}:C \vdash t_0:U \qquad U<:T
-\atop {
-% CT(C)=\iclass{C}{D}{I}
-% \onto{
-% \sig(C) = \Sigma \qquad is\sig ok(\Sigma)
-T\ m(\aargs T\ \aargs x);\,\in\,\sig(C)
-% }
-}
-}
-}{
-T \  m(\aargs T \aargs x)\; \{ \syntaxkeyword{return } t_0;\} \text{ OK in C}
-}\\[20pt]
-&&\syntaxtag{(C OK for I)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-T \; m(\aargs T \aargs x); \in \sig(I) \qquad mbody(m,C)=(\aargs x,t_0)
-\atop
-mtype(m, C) = \aargs T \rightarrow U \qquad U = T \hs
-}
-}{ C\text{ OK for }I} \hspace{-300pt} &\\[20pt]
-&&\syntaxtag{alternative (C OK for I)} \\[-20pt]
-&\dfrac{
-\sig(I) \subseteq \sig(C)
-}{ C\text{ OK for }I} &\\
-\end{flalign*}
-\end{frame}
+    \begin{frame}
+      \frametitle{The new typing rules}
+      \vspace{-30pt}
+      \begin{flalign*}
+        &&\syntaxtag{(T-INVK)} \\[-20pt]
+        &\dfrac{
+          \mathlarge{
+            \Gamma \vdash t_0:C_0 \qquad mtype(m, C_0) = \aargs U \rightarrow T
+            \atop
+            \Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
+          }
+        }{ \Gamma \vdash t_0.m(\aargs t): T \hs} &\\[10pt]
+        &&\syntaxtag{(T-NEW)} \\[-20pt]
+        &\dfrac{
+          \mathlarge{
+            fields(C) = \aargs U \ \aargs f \atop
+            \Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
+          }
+        }{\Gamma \vdash \syntaxkeyword{new }C(\aargs t):C \hs}&\\[10pt]
+      \end{flalign*}
+    \end{frame}
 
-\begin{frame}
-\frametitle{The new typing rules}
-\begin{flalign*}
-&&\syntaxtag{(C OK)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-K  =  C(\aargs U \ \aargs g, \aargs T \ \aargs f)\ \{\syntaxkeyword{super}(\aargs g ); \; \syntaxkeyword{this}.\aargs f = \aargs f;\}
-\onto{
-fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
-\onto{
-\Sigma=\sig(C)\cup\sig(\aargs I) \qquad is\sig ok(\Sigma) \qquad C \text{ OK FOR } \aargs I
-}
-}
-}
-}{\small{\iclass{C}{D}{I} \text{ OK}}}&\\[20pt]
-% &&\syntaxtag{(m OK in I)}\\[-20pt]
-% &\dfrac{
-%   \mathlarge{
-%     \small{CT(I) = \einterface{I}} \qquad J\in \aargs I \atop
-%     override(m,J,\aargs T, T)
-%   }
-% }{T \ m(\aargs T \ \aargs x); \enspace \text{OK in } I } &\\[10pt]
-&&\syntaxtag{(I OK)} \\[-20pt]
-&\dfrac{\sig(I)=\Sigma \qquad is\sig ok(\Sigma)
-% \qquad \aargs S \text{ OK in }I
-}
-{\einterface{I} \enspace \text{OK} } &\\
-\end{flalign*}
-\end{frame}
+    \begin{frame}
+      \frametitle{The new typing rules}
+      \vspace{-30pt}
+      \begin{flalign*}
+        &&\syntaxtag{(m OK in C)} \\[-20pt]
+        &\dfrac{
+          \mathlarge{
+            \aargs x: \aargs T, \syntaxkeyword{this}:C \vdash t_0:U \qquad U<:T
+            \atop {
+              % CT(C)=\iclass{C}{D}{I}
+              % \onto{
+                % \sig(C) = \Sigma \qquad is\sig ok(\Sigma)
+                T\ m(\aargs T\ \aargs x);\,\in\,\sig(C)
+              % }
+            }
+          }
+        }{
+          T \  m(\aargs T \aargs x)\; \{ \syntaxkeyword{return } t_0;\} \text{ OK in C}
+        }\\[20pt]
+        &&\syntaxtag{(C OK for I)} \\[-20pt]
+        &\dfrac{
+          \mathlarge{
+            T \; m(\aargs T \aargs x); \in \sig(I) \qquad mbody(m,C)=(\aargs x,t_0)
+            \atop
+            mtype(m, C) = \aargs T \rightarrow U \qquad U = T \hs
+          }
+        }{ C\text{ OK for }I} \hspace{-300pt} &\\[20pt]
+        &&\syntaxtag{alternative (C OK for I)} \\[-20pt]
+        &\dfrac{
+          \sig(I) \subseteq \sig(C)
+        }{ C\text{ OK for }I} &\\
+      \end{flalign*}
+    \end{frame}
 
-\section{Extending FIJ to intersection types}
+    \begin{frame}
+      \frametitle{The new typing rules}
+      \begin{flalign*}
+        &&\syntaxtag{(C OK)} \\[-20pt]
+        &\dfrac{
+          \mathlarge{
+            K  =  C(\aargs U \ \aargs g, \aargs T \ \aargs f)\ \{\syntaxkeyword{super}(\aargs g ); \; \syntaxkeyword{this}.\aargs f = \aargs f;\}
+            \onto{
+              fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
+              \onto{
+                \Sigma=\sig(C)\cup\sig(\aargs I) \qquad is\sig ok(\Sigma) \qquad C \text{ OK FOR } \aargs I
+              }
+            }
+          }
+        }{\small{\iclass{C}{D}{I} \text{ OK}}}&\\[20pt]
+        % &&\syntaxtag{(m OK in I)}\\[-20pt]
+        % &\dfrac{
+        %   \mathlarge{
+        %     \small{CT(I) = \einterface{I}} \qquad J\in \aargs I \atop
+        %     override(m,J,\aargs T, T)
+        %   }
+        % }{T \ m(\aargs T \ \aargs x); \enspace \text{OK in } I } &\\[10pt]
+        &&\syntaxtag{(I OK)} \\[-20pt]
+        &\dfrac{\sig(I)=\Sigma \qquad is\sig ok(\Sigma)
+        % \qquad \aargs S \text{ OK in }I
+        }
+        {\einterface{I} \enspace \text{OK} } &\\
+    \end{flalign*}
+    \end{frame}
 
-\subsection{What are intersection types?}
+    \section{Extending FIJ to intersection types}
 
-\begin{frame}{What are intersection types?}
-\boldmath
-Let's suppose that we have two types $A$ and $B$.\\
-The intersection type between these types is written like $A\&B$.\\
-\end{frame}
+    \subsection{What are intersection types?}
 
-\begin{frame}[fragile]{What are intersection types?}
-\boldmath
-A simple example of intersection types in pseudo-code.
-\begin{flushleft}
-\begin{lstlisting}[basicstyle=\scriptsize]
-public interface A{
-	public static final String name = "myName";
-}
+    \begin{frame}{What are intersection types?}
+    \boldmath
+    Let's suppose that we have two types $A$ and $B$.\\
+    The intersection type between these types is written like $A\&B$.\\
+    The type $A\&B$ have all the methods of $A$ and $B$ and all the fields of $A$ and $B$.
+	\end{frame}
 
-public interface B{
-	public static final String surname = "mySurname";
-}
+	\subsection{Why intersection types in Java?}
+	\begin{frame}{Why intersection types in Java?}
+	The need of intersection types was born to make possile the typing of constructs like \textbf{conditional expressions}.\\
+	Java need to create an intersection type to be able to statically check the correct type of this thing, Why?
+	\end{frame}
 
-public class C implements A,B{
-}
+	\begin{frame}
+	\frametitle{Conditional expressions problem}
+	Consider the conditional expression \boldmath{$c?a:b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
+	This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The problem is that Java must evaluate the return type statically.
 
-C example = new(C());
-
-print(example.name +" "+ example.surname);
-
-//Print the String "myName mySurname"
-\end{lstlisting}
-\end{flushleft}
-\end{frame}
-
-\subsection{Why intersection types in Java?}
-\begin{frame}{Why intersection types in Java?}
-The need of intersection types was born to make possile the typing of constructs like \textbf{conditional expressions} and \textbf{var}.\\
-Java need to create an intersection type to be able to statically check the correct type of these two things, Why?
-\end{frame}
-
-\begin{frame}
-\frametitle{Conditional expressions problem}
-Consider the conditional expression \boldmath{$c?a:b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
-This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The problem is that Java must evaluate the return type statically.
-
-\begin{center}
-\begin{tikzpicture}[scale = 2.1]
-\node at (4,0) [rectangle,draw] (a100) {$Class\ A$};
-\node at (6,0) [rectangle,draw] (b100) {$Class\ B$};
-\node at (3,1) [rectangle,draw] (c100) {$Object$};
-\node at (5,1) [rectangle,draw] (d100) {$Interface\ I$};
-\node at (7,1) [rectangle,draw] (e100) {$Interface\ H$};
-\draw[dashed, ->] (a100) -> (e100);
-\draw[thick, ->] (a100) -> (c100);
-\draw[thick, ->] (b100) -> (c100);
-\draw[dashed, ->] (a100) -> (d100);
-\draw[dashed, ->] (b100) -> (d100);
-\draw[dashed, ->] (b100) -> (e100);
-\end{tikzpicture}
-\end{center}
+	\begin{center}
+		\begin{tikzpicture}[scale = 2.1]
+		\node at (4,0) [rectangle,draw] (a100) {$Class\ A$};
+		\node at (6,0) [rectangle,draw] (b100) {$Class\ B$};
+		\node at (3,1) [rectangle,draw] (c100) {$Object$};
+		\node at (5,1) [rectangle,draw] (d100) {$Interface\ I$};
+		\node at (7,1) [rectangle,draw] (e100) {$Interface\ H$};
+		\draw[dashed, ->] (a100) -> (e100);
+		\draw[thick, ->] (a100) -> (c100);
+		\draw[thick, ->] (b100) -> (c100);
+		\draw[dashed, ->] (a100) -> (d100);
+		\draw[dashed, ->] (b100) -> (d100);
+		\draw[dashed, ->] (b100) -> (e100);
+		\end{tikzpicture}
+	\end{center}
 \end{frame}
 
 \begin{frame}
@@ -625,34 +608,32 @@ This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The 
 \boldmath
 To solve this problem Java introduces intersection types.\\
 In this way we can consider the return type of the conditional expression as $I\&H$.\\
-This can sound strange because the attitude of Java is to work with nominal types, but it was the only way.
+This can sound strange because the attitude of Java is to work with nominal types, but it was the only way and it happens only statically, dinamically the types will become the nominal relative types.
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Example}
-\framesubtitle{Conditional expression and var}
-\boldmath
+\framesubtitle{Conditional expression problem and var}
 \begin{flushleft}
-	\begin{lstlisting}
-	public interface TypeA {
-	}
-	
-	public interface TypeB {
-	}
-	
-	public class ClassA implements TypeB, TypeA{
-	}
-	
-	public class ClassB implements TypeB, TypeA{
-	}
+	\begin{lstlisting}[basicstyle=\scriptsize]
+		public interface TypeA {
+		}
+		
+		public interface TypeB {
+		}
+		
+		public class ClassA implements TypeB, TypeA{
+		}
+
+		public class ClassB implements TypeB, TypeA{
+		}
 	\end{lstlisting}
 \end{flushleft}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Example}
-\framesubtitle{Conditional expression and var}
-\boldmath
+\framesubtitle{Conditional expression problem and var}
 \begin{flushleft}
 	\begin{lstlisting}[basicstyle=\scriptsize]
 	public class main {
@@ -662,7 +643,6 @@ This can sound strange because the attitude of Java is to work with nominal type
 			System.out.print(a);
 	
 			var v = m((h) -> h>5 ? new ClassA() : new ClassB(), a);
-			v.getClass();
 		}
 	
 		static <T> T m(Function<Double, T> a, Double b) {
@@ -674,64 +654,112 @@ This can sound strange because the attitude of Java is to work with nominal type
 \end{flushleft}
 \end{frame}
 
-\begin{frame}[fragile]
+
+
+\begin{frame}
 \frametitle{Example}
-\framesubtitle{Conditional expression and var}
-
+\framesubtitle{Conditional expression problem and var}\vspace{-20pt}
+\begin{figure}
+\centering
+\includegraphics[width=1.1\linewidth]{"images/esempiovar"}
+\label{fig:schermata-da-2019-05-13-11-59-49}
+\end{figure}\vspace{-20pt}
+In this moment Java create an intersection type between TypeA and TypeB that are the more specialized super type in common for ClassA and ClassB.\\
+The conditional expression statically have type \textbf{TypeA\&TypeB}.\\
+Dinamically the type will become ClassA if a>5 otherwise ClassB.
 \end{frame}
 
-\subsection{Extending the syntax}
-\begin{frame}{The new syntax}
+    \subsection{Extending the syntax}
+    \begin{frame}{The new syntax (1/4)}
+    \framesubtitle{Types}
+      \begin{flalign*}
+        T &::= \hspace{168pt}\syntaxtag{nominal type literal}&\\
+        &\qquad C \; | \; I &\\
+        Any &::= \hspace{188pt}\syntaxtag{any type literal}&\\
+        &\qquad C \; | \; I \; | \; AndC \; | \; AndI&\\
+        AndC &::= \hspace{135pt}\syntaxtag{intersection type C\&I\&...\&I}&\\
+        &\qquad C \, \& \, AndI &\\
+        AndI &::= \hspace{149pt}\syntaxtag{intersection type I\&...\&I}&\\
+        &\qquad I\, \&\, AndI \; | \; I\\
+      \end{flalign*}
+    \end{frame}
+
+	\begin{frame}{The new syntax (2/4)}
+	\framesubtitle{Classes, interfaces, method signatures}
+	\vspace{-10pt}
+	\begin{flalign*}
+	IN &::= \hspace{175pt}\syntaxtag{interface declaration}&\\
+	&\qquad \einterface{I} &\\[10pt]
+	S &::= \hspace{136pt}\syntaxtag{method signature declaration}&\\
+	&\qquad T \; m(\aargs T \ \aargs x);&\\[10pt]
+	CL &::= \hspace{193pt}\syntaxtag{class declaration}&\\
+	&\qquad \iclass{C}{C}{I}&\\
+	\end{flalign*}
+\end{frame}
+
+\begin{frame}{The new syntax (3/4)}
+\framesubtitle{Constructor, methods}
 \begin{flalign*}
-T &::= \hspace{206pt}\syntaxtag{type literal}&\\
-&\qquad C \; | \; I \; | \; AndC \; | \; AndI &\\
-AndC &::= \hspace{135pt}\syntaxtag{intersection type C\&I\&...\&I}&\\
-&\qquad C \, \& \, AndI &\\
-AndI &::= \hspace{149pt}\syntaxtag{intersection type I\&...\&I}&\\
-&\qquad I\, \&\, AndI \; | \; I\\
+K &::= \hspace{165pt}\syntaxtag{constructor declaration}&\\
+&\qquad C(\aargs T \ \aargs f\,) \ \{\,\syntaxkeyword{super}(\aargs f\,); \; \syntaxkeyword{this}.\aargs f = \aargs f;\,\}&\\[10pt]
+M &::= \hspace{138pt}\syntaxtag{complete method declaration}&\\
+&\qquad T \; m(\aargs T \ \aargs x) \ \{\,\syntaxkeyword{return } t;\,\}&\\
 \end{flalign*}
 \end{frame}
 
-\subsection{Extending the subtype relation}
-\begin{frame}
-\frametitle{Extending the definition of the subtype relation}
-
-\begin{definition}
-\vspace{-25pt}
+\begin{frame}{The new syntax (4/4)}
+\framesubtitle{Terms, values}
+\vspace{-10pt}
 \begin{flalign*}
-&T<:T &\\[5pt]
-&T\&T = T &\\[5pt]
-&T\&U <: T &\\[5pt]
-&T\&U <: U &\\[5pt]
-&\dfrac{T<:U \qquad T<:V}{T<:U\&V} &\\
-&T\longrightarrow U\&T\longrightarrow V<:T\longrightarrow(U\&V)
+t &::= &\syntaxtag{terms:}\\
+&\qquad x &\syntaxtag{variables}\\
+&\qquad t.f &\syntaxtag{field access}\\
+&\qquad t.m(\aargs t) &\syntaxtag{method invocation}\\
+&\qquad \syntaxkeyword{new } C(\aargs t) &\syntaxtag{object creation}\\
+&\qquad (Any) \ t &\syntaxtag{cast}\\[10pt]
+v &::= &\syntaxtag{values:}\\
+&\qquad \syntaxkeyword{new } C(\aargs v) &\syntaxtag{object creation}
 \end{flalign*}
-\end{definition}
 \end{frame}
 
+	 \subsection{Extending the subtype relation}
+	\begin{frame}
+	\frametitle{Extending the definition of the subtype relation}
 
-\subsection{Auxiliary functions}
+	\begin{definition}
+		\vspace{-25pt}
+		\begin{flalign*}
+		&T<:T &\\[5pt]
+		&T\&T = T &\\[5pt]
+		&T\&U <: T &\\[5pt]
+		&T\&U <: U &\\[5pt]
+		&\dfrac{T<:U \qquad T<:V}{T<:U\&V} &\\
+		\end{flalign*}
+	\end{definition}
+	\end{frame}
 
-\begin{frame}{Preparing for extension}
-% \framesubtitle{Adding some auxiliary functions}
-\boldmath
-We redefine $mtype$ and $mbody$ for groups of interfaces or groups made by class and interfces.
-\end{frame}
 
-\subsubsection{$\Omega in$ function}
+	\subsection{Auxiliary functions}
 
-\subsubsection{mtype function}
-\begin{frame}
-\frametitle{mtype function for $\aargs I$}
-% \framesubtitle{For interfaces}
-\begin{definition}
-\vspace{-20pt}
-\begin{flalign*}
-&\dfrac{
-U\ m(\aargs U\ \aargs x);\,\in\,\sig(\aargs I)
-}{mtype(m, \aargs I)=\aargs U \rightarrow U}
-\end{flalign*}
-\end{definition}
+	\begin{frame}{Preparing for extension}
+	% \framesubtitle{Adding some auxiliary functions}
+	\boldmath
+	We redefine $mtype$ for groups of interfaces or groups made by class and interfces.
+	\end{frame}
+
+
+	\subsubsection{mtype function}
+	\begin{frame}
+	\frametitle{mtype function for $\aargs I$}
+	% \framesubtitle{For interfaces}
+	\begin{definition}
+		\vspace{-20pt}
+		\begin{flalign*}
+		&\dfrac{
+			U\ m(\aargs U\ \aargs x);\,\in\,\sig(\aargs I)
+		}{mtype(m, \aargs I)=\aargs U \rightarrow U}
+		\end{flalign*}
+	\end{definition}
 \end{frame}
 
 \subsubsection{mtype function}
@@ -785,99 +813,41 @@ The function does not  change after the introduction of intersection types, beca
 &&\syntaxtag{(T-FIELD)} \\[-20pt]
 &\dfrac{ \Gamma \vdash t_0 : C_0 \qquad fields(C_0) = \aargs T \; \aargs f}
 {\Gamma \vdash t_0 . f_i : T_i }&\\[10pt]
-&&\syntaxtag{(T-UCAST)} \\[-20pt]
-&\dfrac{ \Gamma \vdash t_0 : U \qquad U <: T}
-{ \Gamma \vdash (T)\, t_0 : T} &\\[10pt]
-&&\syntaxtag{(T-DCAST)} \\[-20pt]
-&\dfrac{ \Gamma \vdash t_0:U \qquad T <: U \qquad T \neq U}
-{ \Gamma \vdash (T)\, t_0:T}
-\end{flalign*}
-\end{frame}
-
-\begin{frame}
-\frametitle{The new typing rules}
-\vspace{-30pt}
-\begin{flalign*}
-&&\syntaxtag{(T-INVK)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-\Gamma \vdash t_0:C_0 \qquad mtype(m, C_0) = \aargs U \rightarrow T
-\atop
-\Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
-}
-}{ \Gamma \vdash t_0.m(\aargs t): T \hs} &\\[10pt]
 &&\syntaxtag{(T-NEW)} \\[-20pt]
 &\dfrac{
-\mathlarge{
-fields(C) = \aargs U \ \aargs f \atop
-\Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
-}
-}{\Gamma \vdash \syntaxkeyword{new }C(\aargs t):C \hs}&\\[10pt]
+	\mathlarge{
+		fields(C) = \aargs U \ \aargs f \atop
+		\Gamma \vdash \aargs t:\aargs T \qquad \aargs T <: \aargs U \hs
+	}
+}{\Gamma \vdash \syntaxkeyword{new }C(\aargs t):C \hs}&
 \end{flalign*}
+
 \end{frame}
 
 \begin{frame}
 \frametitle{The new typing rules}
 \vspace{-30pt}
 \begin{flalign*}
-&&\syntaxtag{(m OK in C)} \\[-20pt]
-&\dfrac{
+&&\syntaxtag{\textbf{(T-UCAST)}} \\[-20pt]
+&\mathbf{\dfrac{ \pmb{\Gamma} \vdash t_0 : U \qquad U <: T}
+	{ \pmb{\Gamma} \vdash (T)\, t_0 : T}} &\\[10pt]
+&&\syntaxtag{\textbf{(T-DCAST)}} \\[-20pt]
+&\mathbf{\dfrac{ \pmb{\Gamma} \vdash t_0:U \qquad T <: U \qquad T \neq U}
+	{ \pmb{\Gamma} \vdash (T)\, t_0:T}}\vspace{-20pt}\\[10pt]
+&&\syntaxtag{\textbf{(T-INVK)}} \\[-20pt]
+&\mathbf{\dfrac{
 \mathlarge{
-\aargs x: \aargs T, \syntaxkeyword{this}:C \vdash t_0:U \qquad U<:T
-\atop {
-% CT(C)=\iclass{C}{D}{I}
-% \onto{
-% \sig(C) = \Sigma \qquad is\sig ok(\Sigma)
-T\ m(\aargs T\ \aargs x);\,\in\,\sig(C) \vee T\ m(\aargs T\ \aargs x);\,\in\,\sig(\aargs I)
-% }
+	\pmb{\Gamma} \vdash t_0:T \qquad mtype(m, T) = \vv{\bm{ U}} \rightarrow V
+	\atop
+	\pmb{\Gamma} \vdash \vv{\bm{ t}}:\vv{\bm{ V}} \qquad \vv{\bm{ V}} <: \vv{\bm{ U}} \hs
 }
-}
-}{
-T \  m(\aargs T \aargs x)\; \{ \syntaxkeyword{return } t_0;\}\ OK\ in\ C
-}\\[20pt]
-&&\syntaxtag{(C OK for $\aargs I$)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-T \; m(\aargs T \aargs x); \in \sig(\aargs I) \qquad mbody(m,C)=(\aargs x,t_0)
-\atop
-mtype(m, C) = \aargs T \rightarrow U \qquad U = T \hs
-}
-}{ C\ OK\ for\ \aargs I} \hspace{-300pt} &\\[20pt]
-&&\syntaxtag{alternative (C OK for $\aargs I$)} \\[-20pt]
-&\dfrac{
-\sig(\aargs I) \subseteq \sig(C)
-}{ C\text{ OK for }\aargs I} &\\
+}{ \pmb{\Gamma} \vdash t_0.m(\vv{\bm{ t}}): V \hs}}
 \end{flalign*}
-\end{frame}
-
-\begin{frame}
-\frametitle{The new typing rules}
-\begin{flalign*}
-&&\syntaxtag{(C OK)} \\[-20pt]
-&\dfrac{
-\mathlarge{
-K  =  C(\aargs U \ \aargs g, \aargs T \ \aargs f)\ \{\syntaxkeyword{super}(\aargs g ); \; \syntaxkeyword{this}.\aargs f = \aargs f;\}
-\onto{
-fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
-\onto{
-\Sigma=\sig(C)\cup\sig(\aargs I) \qquad is\sig ok(\Sigma) \qquad C \text{ OK FOR } \aargs I
-}
-}
-}
-}{\small{\iclass{C}{D}{I} \text{ OK}}}&\\[20pt]
-% &&\syntaxtag{(m OK in I)}\\[-20pt]
-% &\dfrac{
-%   \mathlarge{
-%     \small{CT(I) = \einterface{I}} \qquad J\in \aargs I \atop
-%     override(m,J,\aargs T, T)
-%   }
-% }{T \ m(\aargs T \ \aargs x); \enspace \text{OK in } I } &\\[10pt]
-&&\syntaxtag{(I OK)} \\[-20pt]
-&\dfrac{\sig(I)=\Sigma \qquad is\sig ok(\Sigma)
-% \qquad \aargs S \text{ OK in }I
-}
-{\einterface{I} \enspace \text{OK} } &\\
-\end{flalign*}
+\scriptsize
+\begin{alertblock}{Note}
+	\boldmath
+	T-INVK, T-UCAST and T-DCAST are the only rules where $T$ can be also an intersection type, because we defined this in the syntax rules.
+\end{alertblock}
 \end{frame}
 
 \begin{frame}{Conditional expressions in Java}
