@@ -974,8 +974,7 @@ So in this case: \newline Join($T_2$, $T_3$) = minimum common supertype.
 
 \begin{frame}{Why we need interfaces?}
     Interfaces are useful because they permit a richer, non-tree-structured, subtype relation: each class has a single superclass (from which it inherits instance variables and method bodies), but may additionally implement any number of interfaces.\newline\newline
-    But, the presence of interfaces in Java actually forces the choice of an algorithmic presentation of the typing relation, which gives each typable term a unique (minimal) type. The reason is an interaction between conditional expressions (written t1 ? t2 : t3 in Java) and interfaces.\newline\newline
-    Therefore: each class will have a single superclass from which itinherits the instances of the variables and the bodies of the methods,but it can also implement any number of interfaces.
+    
 
 \end{frame}
 
@@ -1032,14 +1031,14 @@ But A and B are not related, there is no minimum common supertype. Thus I'm losi
 \draw[thick, ->] (a3) -> (a2);
 \end{tikzpicture}
 \end{center}
-\end{frame}
+ \end{frame}
 
 \begin{frame}{Interface in conditional expression}
 \framesubtitle{Preliminary condition}
     To use the rule, I have to guarantee that for each pair of types, the rule, the algorithm, if it takes the set of common supertypes, there is always a supertype common to the two of them, the minimum.\newline
 And if I add the interfaces here there is no more.
 \end{frame}
-\begin{frame}{Recap: In Java}
+\begin{frame}{Recap}
 Therefore, the basic rule previously seen is correct if I only if I use only classes, but it is not sufficiently expressive and complete with the addition of the interfaces.\newline\newline
 Because there is multiple inheritance, I cannot guarantee that there is the minimum for each pair of types.
     
