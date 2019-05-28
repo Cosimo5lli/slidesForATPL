@@ -90,7 +90,7 @@
       \frametitle{Outline for Section \thesection}
       \tableofcontents[currentsection]
     \end{frame}}
-  
+
 
     \section{Extending FJ to interfaces: FIJ}
 
@@ -99,7 +99,7 @@
       \framesubtitle{The final objective}
       We wanto to introduce interfaces in FJ in order to be able to have a more
       sophisticated structure of the types relation (no more a simple tree).
-      
+
       We want obviously to maintain the core functionality that we have already, just adding interfaces
       on top of that. Moreover, we want to rest sure that every FIJ program is indeed a valid Java
       program, as it was the case for FJ.
@@ -148,7 +148,7 @@
           &\qquad \iclass{C}{C}{I}&\\
         \end{flalign*}
       \end{frame}
-      
+
       \begin{frame}{The new syntax (2/3)}
         \framesubtitle{Constructor, methods, types}
         \begin{flalign*}
@@ -160,7 +160,7 @@
           &\qquad C \; | \; I &\\
         \end{flalign*}
       \end{frame}
-    
+
       \begin{frame}{The new syntax (3/3)}
         \framesubtitle{Terms, values}
         \vspace{-10pt}
@@ -175,7 +175,7 @@
           &\qquad \syntaxkeyword{new } C(\aargs v) &\syntaxtag{object creation}
       \end{flalign*}
     \end{frame}
-      
+
     \subsection{Extending the subtype relation}
     \begin{frame}
       \frametitle{Extending the definition of the subtype relation}
@@ -189,7 +189,7 @@
           &\dfrac{CT(I) = \einterface{I}[J]}{I<: \aargs{J}} &
           % &\dfrac{CT(C) = \iclass{C}{D}{I}}{C<:\aargs{I}} &
       \end{flalign*}
-      \end{definition}    
+      \end{definition}
     \end{frame}
 
     \subsection{Auxiliary functions}
@@ -198,9 +198,9 @@
      \boldmath
       % \framesubtitle{Adding some auxiliary functions}
       We add the $IObject$ type: as $Object$ is the supertype of every class,
-      so $IObject$ is an empty interface outside the Class Table that is the 
+      so $IObject$ is an empty interface outside the Class Table that is the
       supertype of every interface.
-      
+
       We then define a new function $\sig$ on classes and groups of interfaces, we define also a new
       predicate $is\sig ok$ on sets of signatures and we redefine $mtype$ also for interfaces.
     \end{frame}
@@ -215,7 +215,7 @@
         \vspace{-20pt}
         \begin{flalign*}
           &\dfrac{
-            T\ m(\aargs T\ \aargs x);\in\Sigma \land U\ m(\aargs U\ \aargs{y});\in\Sigma 
+            T\ m(\aargs T\ \aargs x);\in\Sigma \land U\ m(\aargs U\ \aargs{y});\in\Sigma
             \;\;\alert{\text{ implies }}\;\; T=U \land \aargs{T}=\aargs{U}
           }{is\sig ok(\Sigma)}
         \end{flalign*}
@@ -275,7 +275,7 @@
       %   dealing with the typing of classes.
       % \end{alertblock}}
     \end{frame}
-    
+
     \subsubsection{mtype function}
     \begin{frame}
       \frametitle{mtype function}
@@ -289,8 +289,8 @@
           % {mtype(m,I) = \aargs T \rightarrow T \hs} &\\[10pt]
           % &\dfrac{
           %   \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
-          %     CT(I) = \einterface{I} 
-          %     \atop m \text{ is not in declared in } I \qquad T\ m(\aargs T\ \aargs x); \in \sig(\aargs I) 
+          %     CT(I) = \einterface{I}
+          %     \atop m \text{ is not in declared in } I \qquad T\ m(\aargs T\ \aargs x); \in \sig(\aargs I)
           %   }
           % }
           % {mtype(m,I) = \aargs T \rightarrow T}
@@ -324,7 +324,7 @@
           % a method declared in an implemented interface, $mtype(m,C)$ will still be defined, returning
           % the expected type for the method. This is not a problem, we will see that we can use $mbody$ to correctly
           % check this.
-          % 
+          %
           Also note that, as was the case in FJ, $mtype(m,C)$ is not defined if the method $m$ is not implemented
           in $C$ or any of its superclasses.
         \end{alertblock}
@@ -362,7 +362,7 @@
     %     \begin{flalign*}
     %       &\dfrac{
     %         \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
-    %           CT(C) = \iclass{C}{D}{I} 
+    %           CT(C) = \iclass{C}{D}{I}
     %           \atop C \ m(\aargs C \ \aargs x); \in \aargs N
     %         }
     %       }
@@ -370,7 +370,7 @@
     %         mtype(m,C) = \aargs C \rightarrow C \hs} &\\[10pt] %a capo di 10 punti per fare spazio
     %       &\dfrac{
     %         \mathlarge{
-    %           CT(C) = \iclass{C}{D}{I} 
+    %           CT(C) = \iclass{C}{D}{I}
     %           \atop m \text{ is not in declared in } I \hs
     %         }
     %       }
@@ -391,7 +391,7 @@
     %         \mathlarge{ % \mathlarge per evitare che le cose scritte sotto \atop vengano piccoline
     %           P = \{m\; \big| \; T\; m(\aargs T \ \aargs x); \in signatures(\aargs I)\}
     %         }
-    %       }          
+    %       }
     %       {names(\aargs I) = P}
     %   \end{flalign*}
     %   \end{definition}
@@ -453,7 +453,7 @@
     % \end{frame}
 
     \subsection{Extending the typing rules}
-    
+
     \begin{frame}
       \frametitle{The new typing rules}
       \vspace{-30pt}
@@ -493,7 +493,7 @@
         }{\Gamma \vdash \syntaxkeyword{new }C(\aargs t):C \hs}&\\[10pt]
       \end{flalign*}
     \end{frame}
-    
+
     \begin{frame}
       \frametitle{The new typing rules}
       \vspace{-30pt}
@@ -527,14 +527,14 @@
         }{ C\text{ OK for }I} &\\
       \end{flalign*}
     \end{frame}
-    
+
     \begin{frame}
       \frametitle{The new typing rules}
       \begin{flalign*}
         &&\syntaxtag{(C OK)} \\[-20pt]
         &\dfrac{
           \mathlarge{
-            K  =  C(\aargs U \ \aargs g, \aargs T \ \aargs f)\ \{\syntaxkeyword{super}(\aargs g ); \; \syntaxkeyword{this}.\aargs f = \aargs f;\} 
+            K  =  C(\aargs U \ \aargs g, \aargs T \ \aargs f)\ \{\syntaxkeyword{super}(\aargs g ); \; \syntaxkeyword{this}.\aargs f = \aargs f;\}
             \onto{
               fields(D)=\aargs U\ \aargs g \qquad \aargs M \text{ OK IN } C \hs
               \onto{
@@ -551,7 +551,7 @@
         %   }
         % }{T \ m(\aargs T \ \aargs x); \enspace \text{OK in } I } &\\[10pt]
         &&\syntaxtag{(I OK)} \\[-20pt]
-        &\dfrac{\sig(I)=\Sigma \qquad is\sig ok(\Sigma) 
+        &\dfrac{\sig(I)=\Sigma \qquad is\sig ok(\Sigma)
         % \qquad \aargs S \text{ OK in }I
         }
         {\einterface{I} \enspace \text{OK} } &\\
@@ -559,15 +559,14 @@
     \end{frame}
 
     \section{Extending FIJ to intersection types}
-    
+
     \subsection{What are intersection types?}
-   
+
     \begin{frame}{What are intersection types?}
     \boldmath
     Let's suppose that we have two types $A$ and $B$.\\
     The intersection type between these types is written like $A\&B$.\\
     The type $A\&B$ have all the methods of $A$ and $B$ and all the fields of $A$ and $B$.
-    
 	\end{frame}
 
 	\subsection{Why intersection types in Java?}
@@ -578,9 +577,9 @@
 
 	\begin{frame}
 	\frametitle{Conditional expressions problem}
-	Consider the conditional expression \boldmath{$c:a?b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
+	Consider the conditional expression \boldmath{$c?a:b$}, where $a$ is of Type $A$ and $b$ is of Type $B$.\\
 	This expression say that if $c$ is true return $a$, otherwise return $b$.\\ The problem is that Java must evaluate the return type statically.
-	
+
 	\begin{center}
 		\begin{tikzpicture}[scale = 2.1]
 		\node at (4,0) [rectangle,draw] (a100) {$Class\ A$};
@@ -716,11 +715,11 @@ v &::= &\syntaxtag{values:}\\
 &\qquad \syntaxkeyword{new } C(\aargs v) &\syntaxtag{object creation}
 \end{flalign*}
 \end{frame}
-	
+
 	 \subsection{Extending the subtype relation}
 	\begin{frame}
 	\frametitle{Extending the definition of the subtype relation}
-	
+
 	\begin{definition}
 		\vspace{-25pt}
 		\begin{flalign*}
@@ -730,17 +729,18 @@ v &::= &\syntaxtag{values:}\\
 		&T\&U <: U &\\[5pt]
 		&\dfrac{T<:U \qquad T<:V}{T<:U\&V} &\\
 		\end{flalign*}
-	\end{definition}    
+	\end{definition}
 	\end{frame}
 
-	
+
 	\subsection{Auxiliary functions}
-	
+
 	\begin{frame}{Preparing for extension}
 	% \framesubtitle{Adding some auxiliary functions}
 	\boldmath
 	We redefine $mtype$ for groups of interfaces or groups made by class and interfces.
 	\end{frame}
+
 
 	\subsubsection{mtype function}
 	\begin{frame}
@@ -843,5 +843,4 @@ v &::= &\syntaxtag{values:}\\
 	T-INVK, T-UCAST and T-DCAST are the only rules where $T$ can be also an intersection type, because we defined this in the syntax rules.
 \end{alertblock}
 \end{frame}
-    
 \end{document}
