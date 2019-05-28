@@ -12,3 +12,6 @@ out/
 *.blg
 *.aux
 *.DS_Store
+*synctex*
+*.swp
+*.vrb
