@@ -9,7 +9,6 @@
 			System.out.print(a);
 
 			var v = m((h) -> h>5 ? new ClassA() : new ClassB(), a);
-			v.getClass();
 		}
 
 		static <T> T m(Function<Double, T> a, Double b) {
