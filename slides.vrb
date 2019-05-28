@@ -1,20 +1,16 @@
-\frametitle{Example}
-\framesubtitle{Conditional expression problem and var}
+\frametitle{Example 3}
+\boldmath
+The body of the Main class.	
 \begin{flushleft}
-	\begin{lstlisting}[basicstyle=\scriptsize]
-	public class main {
-
-		public static void main(String[] args) {
-			double a = Math.random()*10;
-			System.out.print(a);
-
-			var v = m((h) -> h>5 ? new ClassA() : new ClassB(), a);
-		}
-
-		static <T> T m(Function<Double, T> a, Double b) {
-			return a.apply(b);
-		}
-
+\begin{lstlisting}[basicstyle=\scriptsize]
+public class Main {
+	public static void main(String[] args) {
+		var o = (I0 & I1) (x) -> (x + 1);
+		System.out.println(o.apply(1));
+		o.method0();
+		o.method1();
+		System.out.println(o.getClass().getName());
 	}
-	\end{lstlisting}
+}
+\end{lstlisting}
 \end{flushleft}
