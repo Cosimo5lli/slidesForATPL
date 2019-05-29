@@ -965,7 +965,7 @@ So in this case: \newline Join($T_2$, $T_3$) = minimum common supertype.
 \begin{frame}{Interface in conditional expression}
 \framesubtitle{Now, more problems}
 \begin{itemize}
-    \item  How can i adopt the the join and subtype rule?
+    \item  How can i adopt the join and subtype rule?
     \item  Is there always the minimum common supertype between two types upon which I can apply it?
     \end{itemize}
 If exist I use the algorithm, and extract the join.
@@ -989,8 +989,8 @@ In this case the minimum common supertype is the largest.
 
 \begin{frame}{Interface in conditional expression}
     \framesubtitle{In FJ with interfaces}
-    Situations may occur in which I cannot prove that there is always a minimum common supertype, therefore I cannot apply the rule, the algorithm, to look for the join between two classes, because there is not always...\newline
- So, requires the introduction of the join operation between types, which returns the minimum common supertype, however in the presence of interfaces, the subtype relation is not necessarily closed under joins. 
+    Situations may occur in which I cannot prove that there is always a minimum common supertype, therefore I cannot apply the rule \textit{(T-SUB)} between two classes, because there is not always a common type...\newline
+ So, requires the introduction of the join operation between types, which returns the minimum common supertype, however in the presence of interfaces, the subtype relation is not always necessarily closed under joins. 
 \end{frame}
 
 \begin{frame}{Example 0}
@@ -1017,22 +1017,18 @@ But A and B are not related, there is no minimum common supertype. Thus I'm losi
 \end{center}
  \end{frame}
 
-\begin{frame}{Interface in conditional expression}
-\framesubtitle{Preliminary condition}
-    To use the rule, I have to guarantee that for each pair of types, the rule, the algorithm, if it takes the set of common supertypes, there is always a supertype common to the two of them, the minimum.\newline
-And if I add the interfaces here there is no more.
-\end{frame}
 \begin{frame}{Recap}
-Therefore, the basic rule previously seen is correct if I only if I use only classes, but it is not sufficiently expressive and complete with the addition of the interfaces.\newline\newline
-Because there is multiple inheritance, I cannot guarantee that there is the minimum for each pair of types.
+	\framesubtitle{All things up to nows}
+Therefore, the rule \textit{(T-BASE)} is too much low expressive, \textit{(T-SUB)} is correct if I only if I use only classes, but it is not sufficiently expressive and complete with the addition of the interfaces.\newline\newline
+Because there is multiple inheritance, and I cannot guarantee that there is the minimum for each pair of types.
     
 \end{frame}
 
 \begin{frame}{In Java}
-    The last advancement of Java were the intersection types:\newline
+    The last advancement of Java were the intersection types.\newline
     It is the first time that there are types that do not correspond to class names, and the inference system does the same, denotes the type inferring on the structure, this breaks the nominality of the Java type system and enhances the polymorphism.\newline\newline
-    The inference system goes in search of the common supertype, finds the minimum, if it is unique it takes that, if it has so many it makes the intersection, consequently the type becomes $A\&B$.\newline\newline
-    Intersection is the set of all the values that belong both to $I_1$ and to $I_2$, or methods etc ... Consequently, I can call above the conditional expression meditate on $I_1$ and $I_2$ ...
+    Suppose $I_1$ and $I_2$ two interfaces. The inference system goes in search of the common supertype, finds the minimum, if it is unique it takes that, if it has so many it makes the intersection, consequently the type becomes $I_1\&I_2$.\newline\newline
+    Intersection is the set of all the values, methods etc of the entities involved i.e. $I_1$ and $I_2$. Consequently, I can invoke from the intersection type $I_1 \& I_2$ the method own by $I_1$ or $I_2$ ...
 \end{frame}
 
 \begin{frame}{Rules for managing intersection types: In Java}
@@ -1049,9 +1045,10 @@ The algorithm for building the join is easy.
 \end{frame}
 
 \begin{frame}{Example 1}
-
+\framesubtitle{A set of interfaces with minimum common supertype}
 Consider $I_0,I_1,I_2,I_3,I_4$ interfaces.\newline
-The subtypes of $I_1$ are $I_1, I_3, I_4$ in order that the subtype relationship to be closed with respect to the join, it would be necessary that $join(I_3,I_4)$ had as a result a subtype of $I_1$, but it is not so since it is $I_0$.
+This is an example of a normal case, not proper interesting.\newline
+$I_3, I_4$ they are not related, instead $I_1, I_2$, the supertype of $I_3$ and $I_4$ have a minimum common subtype $I_0$. So I would expect the $join(I_3,I_4)=I_0$.
 \begin{center}
 \begin{tikzpicture}[scale = 1.7]
 \node at (4.5,1.5)  (a0) {\LARGE
@@ -1133,7 +1130,7 @@ Below, we show the Main.java class.
 \end{frame}
 
 \begin{frame}{Example 2}
-		\framesubtitle{Case of expression typing with intersection type}
+		\framesubtitle{A set of interfaces without minimum common supertype}
 	Consider $I_0,I_1,I_2,I_3$ interfaces.\newline
 	Here the $join(I_2,I_3)$ it is not defined, since there is not  minimum common supertype.
 	\begin{center}
@@ -1210,7 +1207,7 @@ Below, we show the Main.java class.
 
 \begin{frame}{Example 2}
 	\begin{block}{What does it mean?}
-    \textit{"The intersection type means having both one and the other specific of the interfaces involved, meaning that value is in the intersection of both, consequently with the conditional, if they don't have a minimum supertype common, I can pull it with this.."}
+    \textit{"The intersection type means having both one and the other specific of the interfaces involved, meaning that value is in the intersection of both, consequently with the conditional, if they don't have a minimum supertype common, I can make it with this.."}
 \end{block}
 \end{frame}
 
