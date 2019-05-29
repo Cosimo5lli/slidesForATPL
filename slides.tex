@@ -88,14 +88,15 @@ italian %% The additional keys allow foreign texts to be
 	\AtBeginSection[]{% Print an outline at the beginning of sections
 		\begin{frame}<beamer>
 		\frametitle{Outline for Section \thesection}
+		\footnotesize
 		\tableofcontents[currentsection]
 \end{frame}}
 
-  \AtBeginSection[]{% Print an outline at the beginning of sections
-    \begin{frame}<beamer>
-      \frametitle{Outline for Section \thesection}
-      \tableofcontents[currentsection]
-    \end{frame}}
+%  \AtBeginSection[]{% Print an outline at the beginning of sections
+%    \begin{frame}<beamer>
+%      \frametitle{Outline for Section \thesection}
+%      \tableofcontents[currentsection]
+%    \end{frame}}
 
 
     \section{Extending FJ to interfaces: FIJ}
@@ -346,7 +347,7 @@ italian %% The additional keys allow foreign texts to be
         \begin{flalign*}
           &\dfrac{
             \mathlarge{
-              CT(I) = \iclass{C}{D}{I} \atop
+              CT(C) = \iclass{C}{D}{I} \atop
               T\ m(\aargs T\ \aargs x)\; \{\syntaxkeyword{return }t;\}\,\in\aargs M
             }
           }{mbody(m,C) = (\aargs x, t)}&\\[10pt]
@@ -762,7 +763,7 @@ v &::= &\syntaxtag{values:}\\
 	\end{definition}
 \end{frame}
 
-\subsubsection{mtype function}
+%\subsubsection{mtype function}
 \begin{frame}
 \frametitle{mtype function for C\&$\aargs I$}
 % \framesubtitle{For interfaces}
@@ -783,7 +784,7 @@ U\ m(\aargs U\ \aargs x);\,\in\,\sig(\aargs I)
 \begin{flalign*}
 &\dfrac{
 \mathlarge{
-CT(I) = \iclass{C}{D}{I} \atop
+CT(C) = \iclass{C}{D}{I} \atop
 T\ m(\aargs T\ \aargs x)\; \{\syntaxkeyword{return }t;\}\,\in\aargs M
 }
 }{mbody(m,C) = (\aargs x, t)}&\\[10pt]
